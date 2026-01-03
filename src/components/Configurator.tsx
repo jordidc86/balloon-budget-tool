@@ -29,11 +29,35 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     }
   };
 
+  const addKit = (kit: any) => {
+    const kitItems = catalog?.products.filter(p => kit.items.includes(p.id)) || [];
+    const newItems = [...items];
+    kitItems.forEach(p => {
+      const existing = newItems.find(i => i.productId === p.id);
+      if (existing) existing.quantity += 1;
+      else newItems.push({ productId: p.id, name: p.name, price: p.price * (1 - kit.discount), quantity: 1 });
+    });
+    setItems(newItems);
+  };
+
   const removeItem = (id: string) => {
     setItems(items.filter(i => i.productId !== id));
   };
 
   const total = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+  // Compatibility logic: if a basket is selected, filter burners.
+  const selectedBasketIds = items.filter(i => {
+    const p = catalog?.products.find(prod => prod.id === i.productId);
+    return p?.category === 'Basket';
+  }).map(i => i.productId);
+
+  const filteredProducts = catalog?.products.filter(p => {
+    if (p.category === 'Burner' && selectedBasketIds.length > 0) {
+      return p.compatibleWith?.some(c => selectedBasketIds.includes(c));
+    }
+    return true;
+  });
 
   const generatePDF = () => {
     const doc = new jsPDF() as any;
@@ -118,22 +142,56 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Catalog Section */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {catalog.products.map(product => (
-              <Card key={product.id} className="group hover:border-blue-500/50 transition-all duration-300">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">{product.category}</span>
-                  <span className="text-lg font-mono font-bold text-blue-300">{product.price.toLocaleString()} €</span>
-                </div>
-                <h3 className="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">{product.name}</h3>
-                <p className="text-gray-400 text-sm mb-4 line-clamp-2">{product.description}</p>
-                <Button variant="outline" onClick={() => addItem(product)} className="w-full flex gap-2 items-center justify-center py-2 text-sm">
-                  <Plus className="w-4 h-4" /> Add to Budget
-                </Button>
-              </Card>
-            ))}
-          </div>
+        <div className="lg:col-span-2 space-y-8">
+          {/* Kits Section */}
+          {catalog.kits.length > 0 && (
+            <section className="space-y-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <span className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">★</span>
+                Recommended Kits
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {catalog.kits.map(kit => (
+                  <Card key={kit.id} className="border-blue-500/30 bg-blue-500/5 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 px-3 py-1 bg-blue-600 text-[10px] font-bold tracking-tighter rounded-bl-lg">
+                      {Math.round(kit.discount * 100)}% OFF
+                    </div>
+                    <h3 className="text-lg font-bold mb-1">{kit.name}</h3>
+                    <p className="text-xs text-gray-400 mb-4 italic">Complete setup with bundle discount.</p>
+                    <Button onClick={() => addKit(kit)} className="w-full py-2 text-xs">
+                      Select Kit
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Products Grid */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400">📦</span>
+              Browse Catalog
+              {selectedBasketIds.length > 0 && (
+                <span className="text-xs font-normal text-blue-400 ml-2 animate-pulse">(Filtered by compatibility)</span>
+              )}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredProducts?.map(product => (
+                <Card key={product.id} className="group hover:border-blue-500/50 transition-all duration-300">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-bold text-blue-500 uppercase tracking-widest">{product.category}</span>
+                    <span className="text-lg font-mono font-bold text-blue-300">{product.price.toLocaleString()} €</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">{product.name}</h3>
+                  <p className="text-gray-400 text-sm mb-4 line-clamp-2">{product.description}</p>
+                  <Button variant="outline" onClick={() => addItem(product)} className="w-full flex gap-2 items-center justify-center py-2 text-sm">
+                    <Plus className="w-4 h-4" /> Add to Budget
+                  </Button>
+                </Card>
+              ))}
+            </div>
+          </section>
         </div>
 
         {/* Summary Section */}
