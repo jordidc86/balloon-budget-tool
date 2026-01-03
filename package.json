@@ -6,7 +6,7 @@
     "dev": "next dev",
     "prisma:generate": "prisma generate",
     "build": "npm run prisma:generate && next build",
-    "postbuild": "if [ \"$NETLIFY\" != \"true\" ]; then mkdir -p .next/standalone/.next && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ ; fi",
+    "postbuild": "mkdir -p .next/standalone/.next && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/",
     "start": "node server.js",
     "lint": "next lint"
   },
