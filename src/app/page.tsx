@@ -47,12 +47,13 @@ export default function Home() {
   );
 }
 
-function VendorCard({ name, onClick, color }: { name: string, onClick: () => void, color: string }) {
+function VendorCard({ name, onClick, color, image }: { name: string, onClick: () => void, color: string, image: string }) {
   return (
     <Card 
       className={`group cursor-pointer transition-all duration-500 hover:-translate-y-2 flex flex-col items-center justify-center p-12 min-h-[300px] border-2 border-transparent ${color}`}
       onClick={onClick}
     >
+      {/* Optional: Add image display if needed, but for now just fixing the type error */}
       <div className="text-4xl font-black tracking-tighter mb-4 transition-transform duration-500 group-hover:scale-110">
         {name}
       </div>
