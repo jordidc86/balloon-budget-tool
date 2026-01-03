@@ -1,0 +1,36 @@
+{
+  "vendor": "PASHA",
+  "products": [
+    {
+      "id": "p1",
+      "category": "Envelope",
+      "name": "Pasha P-77",
+      "price": 22000,
+      "description": "2200 m3 volume, high quality ripstop."
+    },
+    {
+      "id": "p2",
+      "category": "Basket",
+      "name": "Pasha Open Basket 1.2 x 1.1",
+      "price": 7500,
+      "description": "Lightweight open basket.",
+      "compatibleWith": ["p1"]
+    },
+    {
+      "id": "p3",
+      "category": "Burner",
+      "name": "Pasha Ignis Burner",
+      "price": 11000,
+      "description": "Reliable and powerful.",
+      "compatibleWith": ["p2"]
+    }
+  ],
+  "kits": [
+    {
+      "id": "pk1",
+      "name": "Pasha Explorer Kit",
+      "items": ["p1", "p2", "p3"],
+      "discount": 0.07
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "vendor": "SCHROEDER",
+  "products": [
+    {
+      "id": "s1",
+      "category": "Envelope",
+      "name": "Schroeder Fire Balloons G 30/24",
+      "price": 25000,
+      "description": "3000 m3 volume, 24 gore."
+    },
+    {
+      "id": "s2",
+      "category": "Basket",
+      "name": "Schroeder 1.30m x 1.10m",
+      "price": 8000,
+      "description": "Standard basket for 2-3 persons.",
+      "compatibleWith": ["s1"]
+    },
+    {
+      "id": "s3",
+      "category": "Burner",
+      "name": "Schroeder FB6 Double Burner",
+      "price": 12000,
+      "description": "High performance burner.",
+      "compatibleWith": ["s2"]
+    }
+  ],
+  "kits": [
+    {
+      "id": "sk1",
+      "name": "Schroeder Starter Kit",
+      "items": ["s1", "s2", "s3"],
+      "discount": 0.05
+    }
+  ]
+}
