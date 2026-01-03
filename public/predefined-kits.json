@@ -1,0 +1,53 @@
+{
+    "pasha": [
+        {
+            "id": "kit-pasha-90",
+            "name": "PH-90 Complete Kit",
+            "envelope": "PH-90",
+            "basket": "S-16 Basket",
+            "burner": "Double Burner",
+            "description": "Compact 2-3 passenger balloon"
+        },
+        {
+            "id": "kit-pasha-120",
+            "name": "PH-120 Complete Kit",
+            "envelope": "PH-120",
+            "basket": "S-16 Basket",
+            "burner": "Double Burner",
+            "description": "Standard 2-3 passenger balloon"
+        },
+        {
+            "id": "kit-pasha-210",
+            "name": "PH-210 Complete Kit",
+            "envelope": "PH-210",
+            "basket": "S-30N Basket",
+            "burner": "Triple Burner",
+            "description": "Large 4-6 passenger balloon"
+        },
+        {
+            "id": "kit-pasha-300",
+            "name": "PH-300 Complete Kit",
+            "envelope": "PH-300",
+            "basket": "S-30N Basket",
+            "burner": "Triple Burner",
+            "description": "Enhanced 4-6 passenger balloon"
+        },
+        {
+            "id": "kit-pasha-370",
+            "name": "PH-370 Complete Kit",
+            "envelope": "PH-370",
+            "basket": "S-38 Basket",
+            "burner": "Quadruple Burner",
+            "description": "Standard 6-8 passenger balloon"
+        },
+        {
+            "id": "kit-pasha-525l",
+            "name": "PH-525L Complete Kit",
+            "envelope": "PH-525L",
+            "basket": "S-54 Basket",
+            "burner": "Quadruple Burner",
+            "description": "Extended 10-12 passenger balloon"
+        }
+    ],
+    "schroeder": []
+}

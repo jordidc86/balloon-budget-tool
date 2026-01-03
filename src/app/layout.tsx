@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <div className="bg-mesh" />
         <main className="relative min-h-screen">
           {children}

@@ -15,9 +15,31 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+    
+    // Generate sequential number if not provided or to enforce pattern
+    let finalQuotationNumber = data.quotationNumber;
+    
+    if (!finalQuotationNumber || finalQuotationNumber.includes('Draft')) {
+      const year = new Date().getFullYear();
+      const lastQuotation = await prisma.quotation.findFirst({
+        where: { quotationNumber: { startsWith: `${year}-` } },
+        orderBy: { id: 'desc' }
+      });
+
+      let nextSeq = 1;
+      if (lastQuotation) {
+        const lastParts = lastQuotation.quotationNumber.split('-');
+        const lastSeq = parseInt(lastParts[1]);
+        if (!isNaN(lastSeq)) {
+          nextSeq = lastSeq + 1;
+        }
+      }
+      finalQuotationNumber = `${year}-${String(nextSeq).padStart(3, '0')}`;
+    }
+
     const quotation = await prisma.quotation.create({
       data: {
-        quotationNumber: data.quotationNumber,
+        quotationNumber: finalQuotationNumber,
         customerData: data.customerData,
         items: data.items,
         total: data.total,

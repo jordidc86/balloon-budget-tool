@@ -1,36 +1,857 @@
 {
-  "vendor": "SCHROEDER",
-  "products": [
+  "categories": [
     {
-      "id": "s1",
-      "category": "Envelope",
-      "name": "Schroeder Fire Balloons G 30/24",
-      "price": 25000,
-      "description": "3000 m3 volume, 24 gore."
+      "name": "ENVELOPE",
+      "items": [
+        {
+          "id": "item_1",
+          "name": "18/16 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-1800 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-16 Gores\n-Envelope bag",
+          "price": 18300.0
+        },
+        {
+          "id": "item_2",
+          "name": "20/16 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-2000 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-16 Gores\n-Envelope bag",
+          "price": 19300.0
+        },
+        {
+          "id": "item_3",
+          "name": "22/16 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-2200 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-16 Gores\n-Envelope bag",
+          "price": 20400.0
+        },
+        {
+          "id": "item_4",
+          "name": "26/16 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-2600 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-16 Gores\n-Envelope bag",
+          "price": 23450.0
+        },
+        {
+          "id": "item_5",
+          "name": "30/16 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-3000 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-16 Gores\n-Envelope bag",
+          "price": 25600.0
+        },
+        {
+          "id": "item_6",
+          "name": "34/16 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-3400 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-16 Gores\n-Envelope bag",
+          "price": 26200.0
+        },
+        {
+          "id": "item_7",
+          "name": "18/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-1800 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 20800.0
+        },
+        {
+          "id": "item_8",
+          "name": "22/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-2200 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 21900.0
+        },
+        {
+          "id": "item_9",
+          "name": "26/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-2600 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 24800.0
+        },
+        {
+          "id": "item_10",
+          "name": "30/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-3000 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 26800.0
+        },
+        {
+          "id": "item_11",
+          "name": "34/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-3400 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 27900.0
+        },
+        {
+          "id": "item_12",
+          "name": "36/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-3600 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 29400.0
+        },
+        {
+          "id": "item_13",
+          "name": "40/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-4000 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 32600.0
+        },
+        {
+          "id": "item_14",
+          "name": "42/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-4200 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 35800.0
+        },
+        {
+          "id": "item_15",
+          "name": "45/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-4500 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 36800.0
+        },
+        {
+          "id": "item_16",
+          "name": "50/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-5000 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 39900.0
+        },
+        {
+          "id": "item_17",
+          "name": "60/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-6000 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 43100.0
+        },
+        {
+          "id": "item_18",
+          "name": "70/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-7000 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 46800.0
+        },
+        {
+          "id": "item_19",
+          "name": "85/24 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-8500 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 51500.0
+        },
+        {
+          "id": "item_20",
+          "name": "105/28 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-10500 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-28 Gores\n-Envelope bag",
+          "price": 57700.0
+        },
+        {
+          "id": "item_21",
+          "name": "125/28 Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-12500 cubıc meters volume\n-1 panel Nomex Throat\n-A triangular Scoop made from NOMEX\n-28 Gores\n-Envelope bag",
+          "price": 68000.0
+        },
+        {
+          "id": "item_22",
+          "name": "18/24 Mistral Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-1800 cubıc meters volume\n-Racer Balloon\n-1 panel Nomex Throat\n-5 Rows of Thermogrip\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 19250.0
+        },
+        {
+          "id": "item_23",
+          "name": "20/24 Mistral Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-1800 cubıc meters volume\n-Racer Balloon\n-1 panel Nomex Throat\n-5 Rows of thermogrip\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 20100.0
+        },
+        {
+          "id": "item_24",
+          "name": "22/24 Mistral Envelope",
+          "description": "-Top Three Panel Hyperlast Fabric\n-100% Fire Retardant Nomex Throat\n-2200 cubıc meters volume\n-Racer Balloon\n-1 panel Nomex Throat\n-5 Rows of Thermogrip\n-A triangular Scoop made from NOMEX\n-24 Gores\n-Envelope bag",
+          "price": 20950.0
+        }
+      ]
     },
     {
-      "id": "s2",
-      "category": "Basket",
-      "name": "Schroeder 1.30m x 1.10m",
-      "price": 8000,
-      "description": "Standard basket for 2-3 persons.",
-      "compatibleWith": ["s1"]
+      "name": "ROTATION VENTS",
+      "items": [
+        {
+          "id": "item_26",
+          "name": "Rotation Vents / Single",
+          "description": "-Single Rotation Vent System",
+          "price": 1150.0
+        },
+        {
+          "id": "item_27",
+          "name": "Rotation Vents / Double",
+          "description": "-Double Rotation Vent System",
+          "price": 1650.0
+        }
+      ]
     },
     {
-      "id": "s3",
-      "category": "Burner",
-      "name": "Schroeder FB6 Double Burner",
-      "price": 12000,
-      "description": "High performance burner.",
-      "compatibleWith": ["s2"]
-    }
-  ],
-  "kits": [
+      "name": "QUICK DEFLATION SYSTEM",
+      "items": [
+        {
+          "id": "item_29",
+          "name": "Quick Deflation System Up to 40/24",
+          "description": "-Quick Deflation Parachute System",
+          "price": 1150.0
+        },
+        {
+          "id": "item_30",
+          "name": "Quick Deflation System From 42/24",
+          "description": "-Quick Deflation Parachute System",
+          "price": 1550.0
+        }
+      ]
+    },
     {
-      "id": "sk1",
-      "name": "Schroeder Starter Kit",
-      "items": ["s1", "s2", "s3"],
-      "discount": 0.05
+      "name": "ENVELOPE SUPPLEMENTS",
+      "items": [
+        {
+          "id": "item_32",
+          "name": "Artwork",
+          "description": "-Envelope Artwork Application \"xxx\"",
+          "price": 0.0
+        },
+        {
+          "id": "item_33",
+          "name": "Hyperlast configuration",
+          "description": "-Complimentary as 40th Anniversary",
+          "price": 0.0
+        },
+        {
+          "id": "item_34",
+          "name": "Additional row of Nomex",
+          "description": "-100% Fire Retardant Nomex",
+          "price": 600.0
+        },
+        {
+          "id": "item_35",
+          "name": "Additional row of Silver Fabric",
+          "description": "-Row of silver fabric",
+          "price": 168.0
+        },
+        {
+          "id": "item_36",
+          "name": "Additional row of Gold Fabric",
+          "description": "-Row of gold fabric",
+          "price": 96.0
+        },
+        {
+          "id": "item_37",
+          "name": "Double Gear Supplement",
+          "description": "-Special Red/White Double Gear System",
+          "price": 460.0
+        }
+      ]
+    },
+    {
+      "name": "BURNER",
+      "items": [
+        {
+          "id": "item_39",
+          "name": "FB7 Double Burner",
+          "description": "-FB7 Double Burner\n-Rego type Fitting",
+          "price": 7150.0
+        },
+        {
+          "id": "item_40",
+          "name": "FB7 Triple Burner",
+          "description": "-FB7 Triple Burner \n-Rego type Fitting",
+          "price": 11250.0
+        },
+        {
+          "id": "item_41",
+          "name": "FB7 Quadruple Burner",
+          "description": "-FB7 Quadruple Burner \n-Rego type Fitting",
+          "price": 13650.0
+        }
+      ]
+    },
+    {
+      "name": "BURNER FRAME",
+      "items": [
+        {
+          "id": "item_43",
+          "name": "FB7 Double Burner Frame",
+          "description": "-Burner Frame attachment for double burner",
+          "price": 950.0
+        },
+        {
+          "id": "item_44",
+          "name": "FB7 Double Adjustable  Burner Frame",
+          "description": "-Adjustable Burner Frame attachment for double burner",
+          "price": 1250.0
+        },
+        {
+          "id": "item_45",
+          "name": "FB7 Triple Burner Frame",
+          "description": "-Burner Frame attachment for triple burner",
+          "price": 1350.0
+        },
+        {
+          "id": "item_46",
+          "name": "FB7 Triple Adjustable Burner Frame",
+          "description": "-Adjustable Burner Frame attachment for triple burner",
+          "price": 1650.0
+        },
+        {
+          "id": "item_47",
+          "name": "FB7 Quadruple Burner Frame",
+          "description": "-Burner Frame attachment for quadruple burner",
+          "price": 1350.0
+        },
+        {
+          "id": "item_48",
+          "name": "FB7 Quadruple Adjustable Burner Frame",
+          "description": "-Adjustable Burner Frame attachment for quadruple burner",
+          "price": 1650.0
+        }
+      ]
+    },
+    {
+      "name": "BASKET",
+      "items": [
+        {
+          "id": "item_50",
+          "name": "IV  Open Basket",
+          "description": "-1,15 x 1,45 meters Open Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in compartment\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 8150.0
+        },
+        {
+          "id": "item_51",
+          "name": "IV Open Basket",
+          "description": "-1,15 x 1,45 meters Open Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in compartment\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 8350.0
+        },
+        {
+          "id": "item_52",
+          "name": "V Open Basket",
+          "description": "-1,20 x 1,55 meters Open Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in compartment\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 9000.0
+        },
+        {
+          "id": "item_53",
+          "name": "VI Partition Basket",
+          "description": "-1,25 x 1,75 meters Partition Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in compartment\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 9950.0
+        },
+        {
+          "id": "item_54",
+          "name": "VI Single T Basket",
+          "description": "-1,25 x 2,00 meters Single T Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 12150.0
+        },
+        {
+          "id": "item_55",
+          "name": "VII Center Partition Basket",
+          "description": "-1,45 x 2,15 meters Partition Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 14800.0
+        },
+        {
+          "id": "item_56",
+          "name": "VIII / 8 Single T Basket",
+          "description": "-1,45 x 2,45 meters Single T Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 17500.0
+        },
+        {
+          "id": "item_57",
+          "name": "VIII / 9 Double T Basket",
+          "description": "-1,45 x 2,60 meters Double T Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 21300.0
+        },
+        {
+          "id": "item_58",
+          "name": "IX /11 Center Partition Basket",
+          "description": "-1,50 x 2,75 meters Partition Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 23050.0
+        },
+        {
+          "id": "item_59",
+          "name": "X/15 Double T Basket",
+          "description": "-1,70 x 3,00 meters Double T Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 28350.0
+        },
+        {
+          "id": "item_60",
+          "name": "XI/19 Double T Basket",
+          "description": "-1,70 x 3,80 meters Double T Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Handrail Supplement\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 29700.0
+        },
+        {
+          "id": "item_61",
+          "name": "XII/23 Double T Basket",
+          "description": "-1,70 x 4,20 meters Double T Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 32100.0
+        },
+        {
+          "id": "item_62",
+          "name": "XIII/27 Double T Basket",
+          "description": "-1,70 x 4,80 meters Double T Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 36000.0
+        },
+        {
+          "id": "item_63",
+          "name": "M2 Competition Basket",
+          "description": "-0,95 x 1,15 meters Open Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 7900.0
+        },
+        {
+          "id": "item_64",
+          "name": "M3 Competition Basket",
+          "description": "-1,00 x 1,30 meters Open Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 8400.0
+        },
+        {
+          "id": "item_65",
+          "name": "M5 Competition Basket",
+          "description": "-1,20 x 1,55 meters Open Type\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 8850.0
+        },
+        {
+          "id": "item_66",
+          "name": "Panorama Basket",
+          "description": "1,25 x 1,75 meters Seated Panorama Basket\n-Leather padding basket Rim\n-Leather or Alcantara pole covers\n-Leather base supplement\n-Basket Bottom Cushion Floor\n-Basket Sidewall Cushion Set\n-Handles in all compartments\n-Pilot Restraint harness\n-Safety Kit -Fire Ex., Blanket & First aid kit",
+          "price": 18650.0
+        }
+      ]
+    },
+    {
+      "name": "BASKET SUPPLEMENTS",
+      "items": [
+        {
+          "id": "item_68",
+          "name": "Single Elephant Ear",
+          "description": "-Stainless steel frame\n-Stainless steel heatshield",
+          "price": 695.0
+        },
+        {
+          "id": "item_69",
+          "name": "Double Elephant Ear",
+          "description": "-Stainless steel frames\n-Stainless steel heatshields",
+          "price": 1155.0
+        },
+        {
+          "id": "item_70",
+          "name": "Double Side Runner Set",
+          "description": "-Special Runners for basket sidewall",
+          "price": 160.0
+        },
+        {
+          "id": "item_71",
+          "name": "Triple Side Runner Set",
+          "description": "-Special Runners for basket sidewall",
+          "price": 210.0
+        },
+        {
+          "id": "item_72",
+          "name": "Quad Side Runner Set",
+          "description": "-Special Runners for basket sidewall",
+          "price": 265.0
+        },
+        {
+          "id": "item_73",
+          "name": "II-V Type Basket Bottom Runner Protectors",
+          "description": "-Special protectors attached on basket runners",
+          "price": 210.0
+        },
+        {
+          "id": "item_74",
+          "name": "VI-X Type Basket Bottom Runner Protectors",
+          "description": "-Special protectors attached on basket runners",
+          "price": 340.0
+        },
+        {
+          "id": "item_75",
+          "name": "Basket Door Supplement",
+          "description": "-The baskets door supplement from size V Basket for entry and exit",
+          "price": 1950.0
+        }
+      ]
+    },
+    {
+      "name": "FUELTANK",
+      "items": [
+        {
+          "id": "item_77",
+          "name": "VA50 Fuel Tank - Slave",
+          "description": "-VA50 Slave cylinder without vapour take off\n-Stainless Steel gas cylinder with enhanced safety features\n-Fitted with quick shut-off valves\n-TEMA or REGO fittings\n-With padded tank cover\n-Impact absorbing rubber protector for top ring\n-Certified according to ADR regulations with German TÜV and \"Pi\" marked",
+          "price": 1750.0
+        },
+        {
+          "id": "item_78",
+          "name": "VA50 Fuel Tank - Master",
+          "description": "-VA50 Master cylinder with pressure regulated vapour take off\n-Stainless Steel gas cylinder with enhanced safety features\n-Fitted with quick shut-off valves\n-TEMA or REGO fittings\n-With padded tank cover\n-Impact absorbing rubber protector for top ring\n-Certified according to ADR regulations with German TÜV and \"Pi\" marked",
+          "price": 1850.0
+        },
+        {
+          "id": "item_79",
+          "name": "VA70 Fuel Tank - Slave",
+          "description": "-VA70 Slave cylinder without vapour take off\n-Stainless Steel gas cylinder with enhanced safety features\n-Fitted with quick shut-off valves\n-TEMA or REGO fittings\n-With padded tank cover\n-Impact absorbing rubber protector for top ring\n-Certified according to ADR regulations with German TÜV and \"Pi\" marked",
+          "price": 2030.0
+        },
+        {
+          "id": "item_80",
+          "name": "VA70 Fuel Tank - Master",
+          "description": "-VA70 Master cylinder with pressure regulated vapour take off\n-Stainless Steel gas cylinder with enhanced safety features\n-Fitted with quick shut-off valves\n-TEMA or REGO fittings\n-With padded tank cover\n-Impact absorbing rubber protector for top ring\n-Certified according to ADR regulations with German TÜV and \"Pi\" marked",
+          "price": 2150.0
+        },
+        {
+          "id": "item_81",
+          "name": "VA100 Fuel Tank - Slave",
+          "description": "-VA100 Slave cylinder without vapour take off\n-Stainless Steel gas cylinder with enhanced safety features\n-Fitted with quick shut-off valves\n-TEMA or REGO fittings\n-With padded tank cover\n-Impact absorbing rubber protector for top ring\n-Certified according to ADR regulations with German TÜV and \"Pi\" marked",
+          "price": 2350.0
+        },
+        {
+          "id": "item_82",
+          "name": "VA100 Fuel Tank - Master",
+          "description": "-VA100 Master cylinder with pressure regulated vapour take off\n-Stainless Steel gas cylinder with enhanced safety features\n-Fitted with quick shut-off valves\n-TEMA or REGO fittings\n-With padded tank cover\n-Impact absorbing rubber protector for top ring\n-Certified according to ADR regulations with German TÜV and \"Pi\" marked",
+          "price": 2450.0
+        }
+      ]
+    },
+    {
+      "name": "FUELTANK SUPPLEMENTS",
+      "items": [
+        {
+          "id": "item_84",
+          "name": "Fuel Tank Strap Short",
+          "description": "-Short Tank strap with quick release buckle",
+          "price": 20.0
+        },
+        {
+          "id": "item_85",
+          "name": "Fuel Tank Strap Long",
+          "description": "-Long Tank strap with quick release buckle",
+          "price": 22.0
+        },
+        {
+          "id": "item_86",
+          "name": "Refuelling Adapter",
+          "description": "-Refueling adapter for TEMA or REGO fittings with integrated vent and backflow valve",
+          "price": 230.0
+        },
+        {
+          "id": "item_87",
+          "name": "Double T-Joint Hose",
+          "description": "-Hose with T-jointfor combining two Cylinders with TEMA or REGO fittings",
+          "price": 290.0
+        },
+        {
+          "id": "item_88",
+          "name": "Triple T-Joint Hose",
+          "description": "-Hose with T-jointfor combining three Cylinders with TEMA or REGO fittings",
+          "price": 450.0
+        },
+        {
+          "id": "item_89",
+          "name": "Quad T-Joint Hose",
+          "description": "-Hose with T-jointfor combining four Cylinders with TEMA or REGO fittings",
+          "price": 605.0
+        }
+      ]
+    },
+    {
+      "name": "ANCILLARY",
+      "items": [
+        {
+          "id": "item_94",
+          "name": "Dropline / 25m",
+          "description": "-25 m of drop line in a basket mounted bag",
+          "price": 185.0
+        },
+        {
+          "id": "item_95",
+          "name": "Dropline / 45m",
+          "description": "-45 m of drop line in a basket mounted bag",
+          "price": 260.0
+        },
+        {
+          "id": "item_96",
+          "name": "Safety Quick Release II-V Type",
+          "description": "-Safety quick release with 5 m of rope for basket sizes II-V",
+          "price": 495.0
+        },
+        {
+          "id": "item_97",
+          "name": "Safety Quick Release Above VI Type",
+          "description": "-Above basket size VI the quick release is fitted with an additional damper unit",
+          "price": 580.0
+        },
+        {
+          "id": "item_98",
+          "name": "Inflation Fan 13hp",
+          "description": "-13hp Cold Inflation Fan Variovent\n-Positioning and starting configuration",
+          "price": 3750.0
+        },
+        {
+          "id": "item_99",
+          "name": "Inflation Fan 9hp",
+          "description": "-9hp Cold Inflation Fan Variovent\n-Positioning and starting configuration",
+          "price": 3150.0
+        },
+        {
+          "id": "item_100",
+          "name": "FLYTECH - GPS Flight Instruments",
+          "description": "-FLYTEC balloon 4 Integrated altimeter and vario\nIncluding temperature sensor",
+          "price": 1590.0
+        },
+        {
+          "id": "item_101",
+          "name": "DBI3 - GPS Flight Instruments",
+          "description": "-DBI3 Digitool Flight Instruments with DBT3",
+          "price": 1300.0
+        },
+        {
+          "id": "item_102",
+          "name": "Air Band Radio Flight Instruments",
+          "description": "-",
+          "price": 0.0
+        },
+        {
+          "id": "item_103",
+          "name": "Land Mobile Radio Flight Instruments",
+          "description": "-",
+          "price": 0.0
+        },
+        {
+          "id": "item_104",
+          "name": "Restraint harness",
+          "description": "-",
+          "price": 215.0
+        },
+        {
+          "id": "item_105",
+          "name": "40 kN Carabiner",
+          "description": "-",
+          "price": 35.0
+        },
+        {
+          "id": "item_106",
+          "name": "25 kN Carabiner",
+          "description": "-",
+          "price": 30.0
+        },
+        {
+          "id": "item_107",
+          "name": "Refuelling Kit",
+          "description": "-",
+          "price": 630.0
+        },
+        {
+          "id": "item_new_1",
+          "name": "Basket Antenna (Korbantenne)",
+          "description": "-Integrated basket antenna",
+          "price": 180.0
+        },
+        {
+          "id": "item_new_2",
+          "name": "Transponder",
+          "description": "-Mode S Transponder",
+          "price": 2200.0
+        },
+        {
+          "id": "item_new_3",
+          "name": "Radio (Funk)",
+          "description": "-8.33 kHz Handheld Radio",
+          "price": 450.0
+        },
+        {
+          "id": "item_new_8",
+          "name": "Launching rope quickrelease 5m incl karabiner",
+          "description": "-5m launching rope including karabiner",
+          "price": 105.0
+        },
+        {
+          "id": "item_new_9",
+          "name": "Launching rope quickrelease 5m with damper and karabiner",
+          "description": "-5m launching rope with damper and karabiner",
+          "price": 180.0
+        }
+      ]
+    },
+    {
+      "name": "CUSTOM OPTION",
+      "items": [
+        {
+          "id": "item_new_4",
+          "name": "Embroidery (Bestickung)",
+          "description": "-Custom embroidery on leather covers",
+          "price": 150.0
+        },
+        {
+          "id": "item_new_5",
+          "name": "Embroidery Setup Fee (Stickkarte)",
+          "description": "-One-time setup fee for new logos",
+          "price": 75.0
+        },
+        {
+          "id": "item_new_6",
+          "name": "Extra Wall Padding (Wandpolster)",
+          "description": "-Extra side wall padding per piece",
+          "price": 120.0
+        },
+        {
+          "id": "item_new_7",
+          "name": "Paperwork Fee (Gebuhr)",
+          "description": "-Administrative fee for registration papers",
+          "price": 300.0
+        }
+      ]
+    },
+    {
+      "name": "Spare Part",
+      "items": [
+        {
+          "id": "item_110",
+          "name": "Hyperlast Fabric",
+          "description": "",
+          "price": 30.0
+        },
+        {
+          "id": "item_111",
+          "name": "Ripstop Fabric",
+          "description": "",
+          "price": 25.0
+        },
+        {
+          "id": "item_112",
+          "name": "Nomex Fabric",
+          "description": "",
+          "price": 55.0
+        },
+        {
+          "id": "item_113",
+          "name": "Adhesive Fabric",
+          "description": "",
+          "price": 55.0
+        }
+      ]
+    },
+    {
+      "name": "TRAINING",
+      "items": [
+        {
+          "id": "item_116",
+          "name": "Maintenance Training",
+          "description": "-Maintenance training course",
+          "price": 6000.0
+        }
+      ]
+    },
+    {
+      "name": "SHIPMENT",
+      "items": [
+        {
+          "id": "item_121",
+          "name": "Pallet for shipment-IV",
+          "description": "-IV basket size heat treated pallet for shipment",
+          "price": 60.0
+        },
+        {
+          "id": "item_122",
+          "name": "Pallet for shipment-V",
+          "description": "-V basket size heat treated pallet for shipment",
+          "price": 60.0
+        },
+        {
+          "id": "item_123",
+          "name": "Pallet for shipment-VI",
+          "description": "-VI basket size heat treated pallet for shipment",
+          "price": 100.0
+        },
+        {
+          "id": "item_124",
+          "name": "Pallet for shipment-VII",
+          "description": "-VII basket size heat treated pallet for shipment",
+          "price": 115.0
+        },
+        {
+          "id": "item_125",
+          "name": "Pallet for shipment-VIII/8",
+          "description": "-VIII/8 basket size heat treated pallet for shipment",
+          "price": 140.0
+        },
+        {
+          "id": "item_126",
+          "name": "Pallet for shipment-VIII/9",
+          "description": "-VIII/9 basket size heat treated pallet for shipment",
+          "price": 150.0
+        },
+        {
+          "id": "item_127",
+          "name": "Pallet for shipment-IX/11",
+          "description": "-IX/11 basket size heat treated pallet for shipment",
+          "price": 160.0
+        },
+        {
+          "id": "item_128",
+          "name": "Pallet for shipment-X/15",
+          "description": "-X/15 basket size heat treated pallet for shipment",
+          "price": 180.0
+        },
+        {
+          "id": "item_129",
+          "name": "Pallet for shipment-XI/19",
+          "description": "-XI/19 basket size heat treated pallet for shipment",
+          "price": 220.0
+        },
+        {
+          "id": "item_130",
+          "name": "Pallet for shipment-XII/23",
+          "description": "-XII/23 basket size heat treated pallet for shipment",
+          "price": 245.0
+        },
+        {
+          "id": "item_131",
+          "name": "Pallet for shipment-XIII/27",
+          "description": "-XIII/27 basket size heat treated pallet for shipment",
+          "price": 270.0
+        },
+        {
+          "id": "item_132",
+          "name": "Pallet for shipment-M2",
+          "description": "-M2 basket size heat treated pallet for shipment",
+          "price": 50.0
+        },
+        {
+          "id": "item_133",
+          "name": "Pallet for shipment-M3",
+          "description": "-M3 basket size heat treated pallet for shipment",
+          "price": 60.0
+        },
+        {
+          "id": "item_134",
+          "name": "Pallet for shipment-M5",
+          "description": "-M5 basket size heat treated pallet for shipment",
+          "price": 70.0
+        },
+        {
+          "id": "item_135",
+          "name": "Pallet for shipment-Panorama",
+          "description": "-Panorama basket size heat treated pallet for shipment",
+          "price": 100.0
+        }
+      ]
+    },
+    {
+      "name": "LEGALIZATION",
+      "items": [
+        {
+          "id": "item_139",
+          "name": "Legalized document supplement-Eg",
+          "description": "-Legalized documents for Egypt",
+          "price": 1950.0
+        },
+        {
+          "id": "item_140",
+          "name": "Legalized document supplement-Az",
+          "description": "-Legalized documents for Azerbaijan",
+          "price": 600.0
+        }
+      ]
+    },
+    {
+      "name": "MODEL BALLOONS",
+      "items": [
+        {
+          "id": "item_146",
+          "name": "TRAILER",
+          "description": "",
+          "price": 9030.0
+        },
+        {
+          "id": "item_147",
+          "name": "STAND BALLOON ENVELOPE",
+          "description": "",
+          "price": 5400.0
+        },
+        {
+          "id": "item_148",
+          "name": "STAND BALLOON BASKET",
+          "description": "",
+          "price": 5500.0
+        }
+      ]
     }
   ]
 }

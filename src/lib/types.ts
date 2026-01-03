@@ -1,30 +1,41 @@
 export type Vendor = 'SCHROEDER' | 'PASHA';
 
-export interface Product {
+export interface CatalogItem {
   id: string;
-  category: string;
   name: string;
-  price: number;
   description: string;
-  compatibleWith?: string[];
+  price: number;
+  category?: string;
 }
 
-export interface Kit {
-  id: string;
+export interface CatalogCategory {
   name: string;
-  items: string[];
-  discount: number;
+  items: CatalogItem[];
 }
 
 export interface Catalog {
-  vendor: Vendor;
-  products: Product[];
-  kits: Kit[];
+  categories: CatalogCategory[];
 }
 
-export interface QuotationItem {
-  productId: string;
+export interface ClientDetails {
   name: string;
-  price: number;
+  country: string;
+  phone: string;
+  email: string;
+}
+
+export interface SelectedItem {
+  item: CatalogItem;
   quantity: number;
+  customPrice?: number;
+  customDescription?: string;
+}
+
+export interface CompatibilityRules {
+  [vendor: string]: {
+    [envelope: string]: {
+      baskets: string[];
+      burners: string[];
+    };
+  };
 }

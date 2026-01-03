@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0f1e;
-  --foreground: #f8fafc;
-  --primary: #1e3a8a;
-  --primary-hover: #1e40af;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
   --accent: #3b82f6;
-  --glass: rgba(30, 58, 138, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.05);
 }
 
 body {
@@ -21,16 +21,17 @@ body {
 
 @layer components {
   .glass-card {
-    @apply bg-opacity-10 backdrop-blur-md border border-white/10 rounded-2xl;
+    @apply backdrop-blur-xl border rounded-3xl shadow-sm transition-all duration-300;
     background-color: var(--glass);
+    border-color: var(--glass-border);
   }
   
   .btn-primary {
-    @apply px-6 py-3 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-blue-900/20 active:scale-95;
+    @apply px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all duration-300 shadow-xl shadow-blue-500/10 active:scale-95;
   }
 
   .btn-outline {
-    @apply px-6 py-3 border border-blue-700/50 hover:bg-blue-700/10 text-blue-400 font-semibold rounded-xl transition-all duration-300 active:scale-95;
+    @apply px-6 py-3 border border-slate-200 hover:border-blue-500/50 hover:bg-blue-50/50 text-slate-600 hover:text-blue-600 font-bold rounded-2xl transition-all duration-300 active:scale-95;
   }
 }
 
@@ -41,9 +42,9 @@ body {
   width: 100%;
   height: 100%;
   z-index: -1;
-  background-color: #0a0f1e;
+  background-color: #f8fafc;
   background-image: 
-    radial-gradient(at 0% 0%, hsla(217, 100%, 15%, 1) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(224, 71%, 19%, 1) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(217, 100%, 15%, 1) 0, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(210, 100%, 98%, 1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(220, 100%, 95%, 1) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(210, 100%, 98%, 1) 0, transparent 50%);
 }

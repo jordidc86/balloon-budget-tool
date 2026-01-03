@@ -52,9 +52,9 @@ export function DbStatus() {
     <div className="fixed bottom-4 right-4 z-50">
       <div className={cn(
         "px-3 py-1 rounded-full text-xs font-mono border backdrop-blur-sm transition-all duration-500",
-        status === 'LOADING' && "bg-gray-500/20 border-gray-500/50 text-gray-400",
-        status === 'OK' && "bg-green-500/20 border-green-500/50 text-green-400 shadow-lg shadow-green-500/20",
-        status === 'FAIL' && "bg-red-500/20 border-red-500/50 text-red-400 shadow-lg shadow-red-500/20"
+        status === 'LOADING' && "bg-slate-100/50 border-slate-200 text-slate-400",
+        status === 'OK' && "bg-emerald-50 border-emerald-200 text-emerald-600 shadow-sm",
+        status === 'FAIL' && "bg-rose-50 border-rose-200 text-rose-600 shadow-sm"
       )}>
         DB: {status}
       </div>

@@ -16,10 +16,10 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
       <div className="max-w-4xl w-full space-y-12 mb-20 animate-in fade-in zoom-in duration-1000">
         <div className="space-y-4">
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter bg-gradient-to-b from-white to-blue-500 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter bg-gradient-to-b from-slate-900 to-blue-600 bg-clip-text text-transparent">
             BALLOON BUDGET TOOL
           </h1>
-          <p className="text-blue-400/80 text-lg md:text-xl font-medium uppercase tracking-widest">
+          <p className="text-slate-400 text-lg md:text-xl font-medium uppercase tracking-widest">
             Schroeder & Pasha Manufacturers
           </p>
         </div>
@@ -40,7 +40,7 @@ export default function Home() {
         </div>
       </div>
 
-      <footer className="fixed bottom-10 text-white/20 text-xs font-mono tracking-widest uppercase">
+      <footer className="fixed bottom-10 text-slate-300 text-xs font-mono tracking-widest uppercase">
         Professional Aerospace Budgeting System v1.0
       </footer>
     </div>
@@ -50,15 +50,14 @@ export default function Home() {
 function VendorCard({ name, onClick, color, image }: { name: string, onClick: () => void, color: string, image: string }) {
   return (
     <Card 
-      className={`group cursor-pointer transition-all duration-500 hover:-translate-y-2 flex flex-col items-center justify-center p-12 min-h-[300px] border-2 border-transparent ${color}`}
+      className={`group cursor-pointer transition-all duration-500 hover:-translate-y-2 flex flex-col items-center justify-center p-12 min-h-[300px] border-2 border-slate-100 bg-white shadow-xl shadow-slate-200/50 hover:shadow-blue-500/10 ${color}`}
       onClick={onClick}
     >
-      {/* Optional: Add image display if needed, but for now just fixing the type error */}
-      <div className="text-4xl font-black tracking-tighter mb-4 transition-transform duration-500 group-hover:scale-110">
+      <div className="text-4xl font-black tracking-tighter mb-4 transition-transform duration-500 group-hover:scale-110 text-slate-900">
         {name}
       </div>
-      <div className="w-12 h-1 bg-white/10 group-hover:w-24 group-hover:bg-blue-500 transition-all duration-500" />
-      <p className="mt-6 text-sm text-gray-500 group-hover:text-blue-300 transition-colors uppercase tracking-widest font-bold">
+      <div className="w-12 h-1 bg-slate-100 group-hover:w-24 group-hover:bg-blue-600 transition-all duration-500" />
+      <p className="mt-6 text-sm text-slate-400 group-hover:text-blue-600 transition-colors uppercase tracking-widest font-bold">
         Enter Catalog
       </p>
     </Card>
