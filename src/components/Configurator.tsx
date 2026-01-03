@@ -186,7 +186,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     
     doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
-    doc.text(`Ref No: ${quotationNumber}`, 195, 33, { align: 'right' });
+    doc.text(`Ref No: ${currentNum}`, 195, 33, { align: 'right' });
     doc.text(`Date: ${new Date().toLocaleDateString()}`, 195, 38, { align: 'right' });
     const validUntil = new Date();
     validUntil.setMonth(validUntil.getMonth() + 1);
