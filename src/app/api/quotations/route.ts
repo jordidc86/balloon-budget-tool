@@ -16,6 +16,8 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     
+    let finalQuotationNumber = data.quotationNumber;
+    
     if (!finalQuotationNumber || finalQuotationNumber.toLowerCase().includes('draft')) {
       const year = new Date().getFullYear();
       // Use raw query or findMany to get the max sequential number reliably
