@@ -114,7 +114,49 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     }
   };
 
+  const saveToDb = async (silent = false) => {
+    if (!clientDetails.name) {
+      if (!silent) alert('Please enter client name');
+      return null;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch('/api/quotations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quotationNumber,
+          customerData: clientDetails,
+          items: selectedList,
+          total: totalAmount,
+          conditions: paymentTerms
+        })
+      });
+      if (res.ok) {
+        const result = await res.json();
+        setQuotationNumber(result.quotationNumber);
+        if (!silent) alert(`Quotation saved successfully! Reference: ${result.quotationNumber}`);
+        return result.quotationNumber;
+      }
+      throw new Error("Save failed");
+    } catch (e) {
+      if (!silent) alert('Error saving quotation');
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const generatePDF = async () => {
+    let currentNum = quotationNumber;
+    
+    // Auto-save if it's a draft
+    if (currentNum.toLowerCase().includes('draft')) {
+      const savedNum = await saveToDb(true); // Silent save
+      if (!savedNum) return; // Stop if save failed
+      currentNum = savedNum;
+    }
+
     const doc = new jsPDF() as any;
     const vendorColor = vendor === 'SCHROEDER' ? [200, 20, 30] : [30, 58, 138]; // Schroeder Red vs Pasha Blue
     
@@ -261,7 +303,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
       doc.setTextColor(150, 150, 150);
       doc.setDrawColor(230, 230, 230);
       doc.line(15, 280, 195, 280);
-      doc.text(`Quotation #${quotationNumber}`, 15, 285);
+      doc.text(`Quotation #${currentNum}`, 15, 285);
       doc.text(`Issued: ${new Date().toLocaleDateString()}`, 105, 285, { align: 'center' });
       doc.text(`Page ${i} of ${pageCount}`, 195, 285, { align: 'right' });
       if (vendor === 'SCHROEDER') {
@@ -272,32 +314,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     doc.save(`Quotation_${vendor}_${clientDetails.name || 'Draft'}.pdf`);
   };
 
-  const saveToDb = async () => {
-    if (!clientDetails.name) return alert('Please enter client name');
-    setSaving(true);
-    try {
-      const res = await fetch('/api/quotations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          quotationNumber,
-          customerData: clientDetails,
-          items: selectedList,
-          total: totalAmount,
-          conditions: paymentTerms
-        })
-      });
-      if (res.ok) {
-        const result = await res.json();
-        setQuotationNumber(result.quotationNumber);
-        alert(`Quotation saved successfully! Reference: ${result.quotationNumber}`);
-      }
-    } catch (e) {
-      alert('Error saving quotation');
-    } finally {
-      setSaving(false);
-    }
-  };
+
 
   if (!catalog) return <div className="p-20 text-center animate-pulse text-blue-400">Loading Configuration...</div>;
 

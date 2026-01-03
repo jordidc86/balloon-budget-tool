@@ -16,20 +16,23 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     
-    // Generate sequential number if not provided or to enforce pattern
-    let finalQuotationNumber = data.quotationNumber;
-    
-    if (!finalQuotationNumber || finalQuotationNumber.includes('Draft')) {
+    if (!finalQuotationNumber || finalQuotationNumber.toLowerCase().includes('draft')) {
       const year = new Date().getFullYear();
+      // Use raw query or findMany to get the max sequential number reliably
       const lastQuotation = await prisma.quotation.findFirst({
-        where: { quotationNumber: { startsWith: `${year}-` } },
-        orderBy: { id: 'desc' }
+        where: { 
+          quotationNumber: { 
+            startsWith: `${year}-`,
+            not: { contains: 'DRAFT' } // Ensure we don't pick up leftovers
+          } 
+        },
+        orderBy: { quotationNumber: 'desc' } // Order by string is safe for 'YYYY-NNN'
       });
 
       let nextSeq = 1;
       if (lastQuotation) {
-        const lastParts = lastQuotation.quotationNumber.split('-');
-        const lastSeq = parseInt(lastParts[1]);
+        const parts = lastQuotation.quotationNumber.split('-');
+        const lastSeq = parseInt(parts[1]);
         if (!isNaN(lastSeq)) {
           nextSeq = lastSeq + 1;
         }
