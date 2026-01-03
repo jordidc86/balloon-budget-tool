@@ -20,6 +20,13 @@ process.on('unhandledRejection', (reason, promise) => {
   log(`CRITICAL: Unhandled Rejection at: ${promise}, reason: ${reason}`);
 });
 
+log('--- STARTUP DIAGNOSTICS ---');
+log(`Node Version: ${process.version}`);
+log(`CWD: ${process.cwd()}`);
+log(`NODE_ENV: ${process.env.NODE_ENV}`);
+log(`DATABASE_URL set: ${!!process.env.DATABASE_URL}`);
+log('---------------------------');
+
 log('Starting production server setup...');
 
 // Hostinger often provides the port in an env var
