@@ -35,6 +35,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
   );
   const [quotationNumber, setQuotationNumber] = useState("");
   const [saving, setSaving] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
   const [loadRef, setLoadRef] = useState("");
   const [loadDate, setLoadDate] = useState("");
@@ -187,16 +188,24 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
   };
 
   const generatePDF = async () => {
+    if (isGenerating || saving) return; // Prevent multiple clicks
+    
+    setIsGenerating(true);
     let currentNum = quotationNumber;
     
     // Auto-save if it's a draft
     if (currentNum.toLowerCase().includes('draft')) {
       const savedNum = await saveToDb(true); // Silent save
-      if (!savedNum) return; // Stop if save failed
+      if (!savedNum) {
+        setIsGenerating(false);
+        alert("Error saving your quotation. Please check your connection and try again.");
+        return; 
+      }
       currentNum = savedNum;
     }
 
-    const doc = new jsPDF() as any;
+    try {
+      const doc = new jsPDF() as any;
     const vendorColor = vendor === 'SCHROEDER' ? [200, 20, 30] : [30, 58, 138]; // Schroeder Red vs Pasha Blue
     
     // Add Logo
@@ -351,6 +360,12 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     }
 
     doc.save(`Quotation_${vendor}_${clientDetails.name || 'Draft'}.pdf`);
+    } catch (e) {
+      console.error("PDF Error:", e);
+      alert("An error occurred during PDF generation.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
 
@@ -379,8 +394,20 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
           <Button variant="outline" onClick={() => setIsLoadModalOpen(true)} className="bg-white border-slate-200 hover:border-blue-500/50 px-6 h-12 rounded-2xl font-bold uppercase tracking-widest text-xs text-slate-600">
             <Search className="w-4 h-4 mr-2" /> Load Quote
           </Button>
-          <Button onClick={generatePDF} className="bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/20 px-8 h-12 rounded-2xl font-bold uppercase tracking-widest text-xs text-white">
-            <Download className="w-4 h-4 mr-2" /> Export PDF
+          <Button 
+            onClick={generatePDF} 
+            disabled={isGenerating || saving}
+            className="bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/20 px-8 h-12 rounded-2xl font-bold uppercase tracking-widest text-xs text-white disabled:opacity-70 disabled:cursor-not-allowed min-w-[160px]"
+          >
+            {isGenerating ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Generating...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 mr-2" /> Export PDF
+              </>
+            )}
           </Button>
         </div>
       </header>
