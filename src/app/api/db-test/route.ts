@@ -3,8 +3,8 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    // Basic connection test
-    await prisma.$queryRaw`SELECT 1`;
+    // Safer connection test using standard findFirst instead of raw query
+    await prisma.quotation.findFirst({ select: { id: true } });
     return NextResponse.json({ 
       status: 'OK', 
       message: 'Database connection successful'

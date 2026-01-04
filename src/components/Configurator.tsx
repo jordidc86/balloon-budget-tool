@@ -159,32 +159,49 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
       if (!silent) alert('Please enter client name');
       return null;
     }
+    
     setSaving(true);
-    try {
-      const res = await fetch('/api/quotations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          quotationNumber,
-          customerData: clientDetails,
-          items: selectedList,
-          total: totalAmount,
-          conditions: paymentTerms
-        })
-      });
-      if (res.ok) {
-        const result = await res.json();
-        setQuotationNumber(result.quotationNumber);
-        if (!silent) alert(`Quotation saved successfully! Reference: ${result.quotationNumber}`);
-        return result.quotationNumber;
+    let attempts = 3;
+    let lastError = null;
+
+    while (attempts > 0) {
+      try {
+        const res = await fetch('/api/quotations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            quotationNumber,
+            customerData: clientDetails,
+            items: selectedList,
+            total: totalAmount,
+            conditions: paymentTerms
+          })
+        });
+        
+        if (res.ok) {
+          const result = await res.json();
+          setQuotationNumber(result.quotationNumber);
+          if (!silent) alert(`Quotation saved successfully! Reference: ${result.quotationNumber}`);
+          setSaving(false);
+          return result.quotationNumber;
+        }
+        
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Save failed");
+      } catch (e: any) {
+        lastError = e;
+        attempts--;
+        if (attempts > 0) {
+          // Wait briefly before retrying pool-related errors
+          await new Promise(r => setTimeout(r, 800));
+        }
       }
-      throw new Error("Save failed");
-    } catch (e) {
-      if (!silent) alert('Error saving quotation');
-      return null;
-    } finally {
-      setSaving(false);
     }
+
+    // After all attempts
+    if (!silent) alert(`Error saving quotation: ${lastError?.message || 'Unknown error'}`);
+    setSaving(false);
+    return null;
   };
 
   const generatePDF = async () => {
