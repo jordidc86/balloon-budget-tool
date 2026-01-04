@@ -201,8 +201,8 @@ export default function CategorySection({
                       else onSelect({ ...item, category: category.name }, 1);
                     }}
                     className={cn(
-                      "mt-1 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all",
-                      checked ? "bg-blue-500 border-blue-500" : "bg-transparent border-slate-300 hover:border-blue-400"
+                      "mt-1 w-6 h-6 rounded-lg border-2 flex-shrink-0 flex items-center justify-center transition-all",
+                      checked ? "bg-blue-600 border-blue-600 shadow-sm" : "bg-slate-50 border-slate-400 hover:border-blue-400 shadow-inner"
                     )}
                   >
                     {checked && <Check className="w-4 h-4 text-white" />}
