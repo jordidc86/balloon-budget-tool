@@ -20,6 +20,23 @@ import {
 import CategorySection from './CategorySection';
 import { Card, Button, cn, Modal } from '@/components/ui';
 
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+};
+
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+};
+
 export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBack: () => void }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [selectedItems, setSelectedItems] = useState<Map<string, SelectedItem>>(new Map());
@@ -271,7 +288,13 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     doc.setFont(undefined, 'bold');
     doc.text("TO:", 120, 55);
     doc.setFont(undefined, 'normal');
-    doc.text(`${clientDetails.name || '---'}\n${clientDetails.country || '---'}\n${clientDetails.email || '---'}\n${clientDetails.phone || '---'}`, 120, 61);
+    const clientLines = [
+      clientDetails.name,
+      clientDetails.country,
+      clientDetails.email,
+      clientDetails.phone
+    ].filter(Boolean);
+    doc.text(clientLines.join('\n'), 120, 61);
 
     // Items Table
     const tableBody = selectedList.map((sel, idx) => {
@@ -281,9 +304,9 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
         idx + 1,
         sel.item.name,
         desc,
-        `€${price.toLocaleString()}`,
+        formatCurrency(price),
         sel.quantity,
-        `€${(price * sel.quantity).toLocaleString()}`
+        formatCurrency(price * sel.quantity)
       ];
     });
 
@@ -307,19 +330,40 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
             5: { cellWidth: 25, halign: 'right', fontStyle: 'bold' }
         },
         styles: { fontSize: 9, cellPadding: 4, lineColor: [200, 200, 200] },
-        alternateRowStyles: { fillColor: [252, 252, 252] }
+        alternateRowStyles: { fillColor: [252, 252, 252] },
+        margin: { top: 50 }, // Reserved for header
+        didDrawPage: (data) => {
+          // Re-draw header elements on each page
+          if (data.pageNumber > 1) {
+            // Logo
+            if (img.complete && img.naturalWidth > 0) {
+              const h = 22;
+              const w = h * 1.472 * 0.93;
+              doc.addImage(img, 'JPEG', 15, 10, w, h, undefined, 'FAST');
+            }
+            // Ref info on top right
+            doc.setTextColor(100, 116, 139);
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.text(`QUOTATION #${currentNum}`, 195, 20, { align: 'right' });
+            doc.text(`Page ${data.pageNumber}`, 195, 25, { align: 'right' });
+          }
+        }
     });
 
     let finalY = (doc as any).lastAutoTable.finalY + 10;
 
-    // Summary Box
+    // Summary Box (Dynamic height)
+    const hasDiscount = discount > 0;
+    const boxHeight = hasDiscount ? 35 : 22;
     const boxWidth = 70;
     const boxX = 195 - boxWidth;
+    
     doc.setFillColor(248, 250, 252);
-    doc.rect(boxX, finalY, boxWidth, 35, 'F');
+    doc.rect(boxX, finalY, boxWidth, boxHeight, 'F');
     doc.setDrawColor(226, 232, 240);
-    doc.rect(boxX, finalY, boxWidth, 35, 'D');
-
+    doc.rect(boxX, finalY, boxWidth, boxHeight, 'D');
+    
     const rawTotal = selectedList.reduce((sum, { item, quantity, customPrice }) => {
       const price = customPrice !== undefined ? customPrice : item.price;
       return sum + (price * quantity);
@@ -329,19 +373,21 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     doc.setTextColor(100, 116, 139);
     doc.text("Subtotal:", boxX + 5, finalY + 10);
     doc.setTextColor(30, 41, 59);
-    doc.text(`€${rawTotal.toLocaleString()}`, 190, finalY + 10, { align: 'right' });
+    doc.text(`${formatCurrency(rawTotal)}`, 190, finalY + 10, { align: 'right' });
     
-    if (discount > 0) {
+    let totalY = finalY + 17;
+    if (hasDiscount) {
       doc.setTextColor(220, 38, 38);
       doc.text(`Discount (${discount}%):`, boxX + 5, finalY + 17);
-      doc.text(`-€${((rawTotal * discount) / 100).toLocaleString()}`, 190, finalY + 17, { align: 'right' });
+      doc.text(`-${formatCurrency((rawTotal * discount) / 100)}`, 190, finalY + 17, { align: 'right' });
+      totalY = finalY + 28;
     }
 
     doc.setFontSize(13);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(vendorColor[0], vendorColor[1], vendorColor[2]);
-    doc.text("TOTAL:", boxX + 5, finalY + 28);
-    doc.text(`€${totalAmount.toLocaleString()}`, 190, finalY + 28, { align: 'right' });
+    doc.text("TOTAL:", boxX + 5, totalY);
+    doc.text(`${formatCurrency(totalAmount)}`, 190, totalY, { align: 'right' });
 
     finalY += 45;
 
@@ -369,14 +415,14 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
       doc.setDrawColor(230, 230, 230);
       doc.line(15, 280, 195, 280);
       doc.text(`Quotation #${currentNum}`, 15, 285);
-      doc.text(`Issued: ${new Date().toLocaleDateString()}`, 105, 285, { align: 'center' });
+      doc.text(`Issued: ${formatDate(new Date())}`, 105, 285, { align: 'center' });
       doc.text(`Page ${i} of ${pageCount}`, 195, 285, { align: 'right' });
       if (vendor === 'SCHROEDER') {
         doc.text("Bank Details: Contact mail@schroederballon.de for payment information", 15, 289);
       }
     }
 
-    doc.save(`Quotation_${vendor}_${clientDetails.name || 'Draft'}.pdf`);
+    doc.save(`Quotation_${vendor}_${clientDetails.name || 'Draft'}_${formatDate(new Date()).replace(/\//g, '-')}.pdf`);
     } catch (e) {
       console.error("PDF Error:", e);
       alert("An error occurred during PDF generation.");
@@ -562,7 +608,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
                       <div className="flex-1 pr-4">
                         <p className="text-sm font-bold text-slate-800 line-clamp-1">{item.name}</p>
                         <p className="text-[10px] text-slate-500 font-mono">
-                          {quantity} x €{(customPrice !== undefined ? customPrice : item.price).toLocaleString()}
+                          {quantity} x {formatCurrency(customPrice !== undefined ? customPrice : item.price)}
                         </p>
                       </div>
                       <button onClick={() => handleRemove(item.id)} className="p-2 text-slate-300 hover:text-red-500 transition-colors">
@@ -574,10 +620,8 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
               </div>
 
               <div className="space-y-3 pt-6 border-t border-slate-100">
-                 <div className="flex justify-between items-center text-xs text-slate-500 px-1">
                   <span>Gross Subtotal</span>
-                  <span className="font-mono text-slate-900">€{selectedList.reduce((s, {item, quantity, customPrice}) => s + ((customPrice ?? item.price) * quantity), 0).toLocaleString()}</span>
-                </div>
+                  <span className="font-mono text-slate-900">{formatCurrency(selectedList.reduce((s, {item, quantity, customPrice}) => s + ((customPrice ?? item.price) * quantity), 0))}</span>
                 
                 <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Discount %</span>
@@ -593,7 +637,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
  
                 <div className="flex justify-between items-center p-4 bg-blue-600 rounded-2xl shadow-lg shadow-blue-500/20 mt-4">
                   <span className="text-xs font-black text-blue-100 uppercase tracking-widest">Net Total</span>
-                  <span className="text-2xl font-black text-white">€{totalAmount.toLocaleString()}</span>
+                  <span className="text-2xl font-black text-white">{formatCurrency(totalAmount)}</span>
                 </div>
               </div>
             </Card>

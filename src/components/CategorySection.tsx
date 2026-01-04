@@ -7,6 +7,15 @@ import { getCompatibleBaskets, getCompatibleBurners } from '@/lib/compatibility'
 import { Card, Button, cn } from '@/components/ui';
 import { ChevronDown, Check, Trash2, Plus, Info } from 'lucide-react';
 
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+};
+
 interface CategorySectionProps {
   category: CatalogCategory;
   selectedItems: Map<string, SelectedItem>;
@@ -119,7 +128,7 @@ export default function CategorySection({
                     >
                       <span className="text-slate-600 group-hover:text-blue-700 font-medium">{item.name}</span>
                       <span className="text-blue-600 font-mono text-sm">
-                        {item.price === 0 ? "FREE" : `€${item.price.toLocaleString()}`}
+                        {item.price === 0 ? "FREE" : formatCurrency(item.price)}
                       </span>
                     </button>
                   ))
@@ -205,7 +214,7 @@ export default function CategorySection({
                         {item.name}
                       </span>
                       <span className="font-mono text-sm text-blue-600 font-bold">
-                        {item.price === 0 && !isArtwork ? "FREE" : `€${item.price.toLocaleString()}`}
+                        {item.price === 0 && !isArtwork ? "FREE" : formatCurrency(item.price)}
                       </span>
                     </div>
                     <p className="text-xs text-slate-400 line-clamp-2">{item.description}</p>
