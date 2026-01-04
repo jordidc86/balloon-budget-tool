@@ -287,13 +287,15 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
 
     doc.setFont(undefined, 'bold');
     doc.text("TO:", 120, 55);
+    doc.setFontSize(10);
     doc.setFont(undefined, 'normal');
     const clientLines = [
       clientDetails.name,
+      clientDetails.contactPerson ? `Att: ${clientDetails.contactPerson}` : null,
       clientDetails.country,
       clientDetails.email,
       clientDetails.phone
-    ].filter(Boolean);
+    ].filter(Boolean) as string[];
     doc.text(clientLines.join('\n'), 120, 61);
 
     // Items Table
@@ -323,11 +325,11 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
         },
         columnStyles: {
             0: { cellWidth: 10, halign: 'center' },
-            1: { cellWidth: 40, fontStyle: 'bold' },
-            2: { cellWidth: 80, fontSize: 8 },
-            3: { cellWidth: 25, halign: 'right' },
-            4: { cellWidth: 15, halign: 'center' },
-            5: { cellWidth: 25, halign: 'right', fontStyle: 'bold' }
+            1: { cellWidth: 35, fontStyle: 'bold' },
+            2: { cellWidth: 70, fontSize: 8 },
+            3: { cellWidth: 32, halign: 'right' },
+            4: { cellWidth: 12, halign: 'center' },
+            5: { cellWidth: 32, halign: 'right', fontStyle: 'bold' }
         },
         styles: { fontSize: 9, cellPadding: 4, lineColor: [200, 200, 200] },
         alternateRowStyles: { fillColor: [252, 252, 252] },
@@ -574,6 +576,12 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
                   value={clientDetails.country}
                   onChange={e => setClientDetails({...clientDetails, country: e.target.value})}
+                />
+                <input
+                  placeholder="Contact Person (Representative)"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                  value={clientDetails.contactPerson || ''}
+                  onChange={e => setClientDetails({...clientDetails, contactPerson: e.target.value})}
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <input

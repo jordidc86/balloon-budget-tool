@@ -19,6 +19,7 @@ export interface Catalog {
 
 export interface ClientDetails {
   name: string;
+  contactPerson?: string;
   country: string;
   phone: string;
   email: string;
