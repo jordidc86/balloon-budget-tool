@@ -202,7 +202,7 @@ export default function CategorySection({
                     }}
                     className={cn(
                       "mt-1 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all",
-                      checked ? "bg-blue-500 border-blue-500" : "bg-transparent border-white/10 hover:border-white/30"
+                      checked ? "bg-blue-500 border-blue-500" : "bg-transparent border-slate-300 hover:border-blue-400"
                     )}
                   >
                     {checked && <Check className="w-4 h-4 text-white" />}
