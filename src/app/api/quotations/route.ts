@@ -1,8 +1,32 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const number = searchParams.get('number');
+    const date = searchParams.get('date'); // Expected format: YYYY-MM-DD
+
+    if (number && date) {
+      // Secure retrieval: must match both number and date portion of createdAt
+      const quotation = await prisma.quotation.findUnique({
+        where: { quotationNumber: number },
+      });
+
+      if (!quotation) {
+        return NextResponse.json({ error: 'Quotation not found' }, { status: 404 });
+      }
+
+      // Check date (YYYY-MM-DD)
+      const createdAtDate = quotation.createdAt.toISOString().split('T')[0];
+      if (createdAtDate !== date) {
+        return NextResponse.json({ error: 'Security verification failed: Date mismatch' }, { status: 403 });
+      }
+
+      return NextResponse.json(quotation);
+    }
+
+    // Default: return all (maybe we should limit this for production, but keeping it for now as per prev code)
     const quotations = await prisma.quotation.findMany({
       orderBy: { createdAt: 'desc' },
     });

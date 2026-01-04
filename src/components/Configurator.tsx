@@ -8,15 +8,13 @@ import {
   ChevronLeft, 
   Save, 
   Download, 
-  Package, 
-  User, 
-  FileText, 
-  Trash2, 
   CreditCard,
-  Plus
+  Plus,
+  RefreshCw,
+  Search
 } from 'lucide-react';
 import CategorySection from './CategorySection';
-import { Card, Button, cn } from '@/components/ui';
+import { Card, Button, cn, Modal } from '@/components/ui';
 
 export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBack: () => void }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
@@ -33,6 +31,10 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
   );
   const [quotationNumber, setQuotationNumber] = useState("");
   const [saving, setSaving] = useState(false);
+  const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
+  const [loadRef, setLoadRef] = useState("");
+  const [loadDate, setLoadDate] = useState("");
+  const [isLoadingQuote, setIsLoadingQuote] = useState(false);
 
   useEffect(() => {
     // Set draft numbering
@@ -111,6 +113,39 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
       }
     } catch (e) {
       console.error("Error loading kit:", e);
+    }
+  };
+
+  const loadFromDb = async () => {
+    if (!loadRef || !loadDate) {
+      alert("Please enter both Reference Number and Date");
+      return;
+    }
+    setIsLoadingQuote(true);
+    try {
+      const res = await fetch(`/api/quotations?number=${encodeURIComponent(loadRef)}&date=${loadDate}`);
+      if (res.ok) {
+        const quote = await res.json();
+        // Map items back
+        const newItems = new Map();
+        quote.items.forEach((sel: any) => {
+          newItems.set(sel.item.id, sel);
+        });
+        setSelectedItems(newItems);
+        setClientDetails(quote.customerData);
+        setQuotationNumber(quote.quotationNumber);
+        setPaymentTerms(quote.conditions || "");
+        setDiscount(0); // Optional: reset or load total
+        setIsLoadModalOpen(false);
+        alert("Quotation loaded successfully!");
+      } else {
+        const err = await res.json();
+        alert(`Error: ${err.error}`);
+      }
+    } catch (e) {
+      alert("Error connecting to server");
+    } finally {
+      setIsLoadingQuote(false);
     }
   };
 
@@ -337,14 +372,49 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
           </div>
         </div>
         <div className="flex gap-4">
-          <Button variant="outline" onClick={saveToDb} disabled={saving} className="bg-white border-slate-200 hover:border-blue-500/50 px-6 h-12 rounded-2xl font-bold uppercase tracking-widest text-xs text-slate-600">
-            <Save className="w-4 h-4 mr-2" /> Save to Cloud
+          <Button variant="outline" onClick={() => setIsLoadModalOpen(true)} className="bg-white border-slate-200 hover:border-blue-500/50 px-6 h-12 rounded-2xl font-bold uppercase tracking-widest text-xs text-slate-600">
+            <Search className="w-4 h-4 mr-2" /> Load Quote
           </Button>
           <Button onClick={generatePDF} className="bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/20 px-8 h-12 rounded-2xl font-bold uppercase tracking-widest text-xs text-white">
             <Download className="w-4 h-4 mr-2" /> Export PDF
           </Button>
         </div>
       </header>
+
+      <Modal 
+        isOpen={isLoadModalOpen} 
+        onClose={() => setIsLoadModalOpen(false)} 
+        title="Load Quotation"
+      >
+        <div className="space-y-4">
+          <p className="text-xs text-slate-500 mb-4 italic">Confirm identity by entering the exact reference number and date of issue.</p>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reference Number</label>
+            <input
+              placeholder="e.g. 2024-001"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:border-blue-500 outline-none transition-all"
+              value={loadRef}
+              onChange={e => setLoadRef(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Date of Issue</label>
+            <input
+              type="date"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:border-blue-500 outline-none transition-all"
+              value={loadDate}
+              onChange={e => setLoadDate(e.target.value)}
+            />
+          </div>
+          <Button 
+            onClick={loadFromDb} 
+            disabled={isLoadingQuote}
+            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-widest text-xs rounded-2xl shadow-lg mt-4 disabled:opacity-50"
+          >
+            {isLoadingQuote ? <RefreshCw className="w-4 h-4 animate-spin mx-auto" /> : 'Verify & Load'}
+          </Button>
+        </div>
+      </Modal>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Main Content */}
