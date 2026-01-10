@@ -127,9 +127,26 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
           if (item) newItems.set(item.id, { item: { ...item, category: catName }, quantity: 1 });
         };
 
-        findAndAdd("ENVELOPE", kit.envelope);
-        findAndAdd("BASKET", kit.basket);
-        findAndAdd("BURNER", kit.burner);
+        if (kit.envelope) findAndAdd("ENVELOPE", kit.envelope);
+        if (kit.basket) findAndAdd("BASKET", kit.basket);
+        if (kit.burner) findAndAdd("BURNER", kit.burner);
+
+        if (kit.items && Array.isArray(kit.items)) {
+          kit.items.forEach((kitItem: any) => {
+            for (const category of catalog.categories) {
+              const item = category.items.find(i => i.id === kitItem.id);
+              if (item) {
+                newItems.set(item.id, { 
+                  item: { ...item, category: category.name }, 
+                  quantity: kitItem.quantity || 1,
+                  customPrice: kitItem.customPrice,
+                  customDescription: kitItem.customDescription
+                });
+                break;
+              }
+            }
+          });
+        }
         
         setSelectedItems(newItems);
       }

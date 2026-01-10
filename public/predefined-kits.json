@@ -44,10 +44,52 @@
             "id": "kit-pasha-525l",
             "name": "PH-525L Complete Kit",
             "envelope": "PH-525L",
-            "basket": "S-54 Basket",
+            "basket": "S-58 Basket",
             "burner": "Quadruple Burner",
-            "description": "Extended 10-12 passenger balloon"
+            "description": "Extended 10-12 passenger balloon",
+            "items": [
+                {"id": "pasha_scoop___ph-525l", "quantity": 1},
+                {"id": "pasha_rotation_vents___ph-525l", "quantity": 1},
+                {"id": "pasha_star_fds", "quantity": 1},
+                {"id": "pasha_double_gear_supplement", "quantity": 1},
+                {"id": "pasha_additional_nomex_panel_supplement", "quantity": 1},
+                {"id": "pasha_dtt_type_burner_frame_attachment", "quantity": 1},
+                {"id": "pasha_double_elephant_ear", "quantity": 1},
+                {"id": "pasha_quad_side_runner_set", "quantity": 1},
+                {"id": "pasha_dtt_basket_bottom_runner_protectors", "quantity": 1},
+                {"id": "pasha_dtt_bottom_cushion_floor", "quantity": 1},
+                {"id": "pasha_dtt_basket_sidewall_cushion_set", "quantity": 1},
+                {"id": "pasha_dropline_40m", "quantity": 1},
+                {"id": "pasha_quick_release_w_type", "quantity": 1},
+                {"id": "pasha_fuelcell_strap", "quantity": 10},
+                {"id": "pasha_t99_fuel_tank", "quantity": 5},
+                {"id": "pasha_pallet_for_shipment-s58", "quantity": 1},
+                {"id": "pasha_legalized_document_supplement-eg", "quantity": 1}
+            ]
         }
     ],
-    "schroeder": []
+    "schroeder": [
+        {
+            "id": "kit-schroeder-34",
+            "name": "SCH-34/24 Kit",
+            "envelope": "34/24 Envelope",
+            "basket": "IV  Open Basket",
+            "burner": "FB7 Double Burner",
+            "description": "Standard 4-5 passenger balloon",
+            "items": [
+                {"id": "item_27", "quantity": 1},
+                {"id": "item_29", "quantity": 1},
+                {"id": "item_44", "quantity": 1},
+                {"id": "item_73", "quantity": 1},
+                {"id": "item_94", "quantity": 1},
+                {"id": "item_96", "quantity": 1},
+                {"id": "item_79", "quantity": 4},
+                {"id": "item_85", "quantity": 8},
+                {"id": "item_98", "quantity": 1},
+                {"id": "item_101", "quantity": 1},
+                {"id": "item_121", "quantity": 1},
+                {"id": "item_32", "quantity": 1, "customPrice": 3000}
+            ]
+        }
+    ]
 }
