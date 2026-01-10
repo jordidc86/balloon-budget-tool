@@ -57,6 +57,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
   const [loadRef, setLoadRef] = useState("");
   const [loadDate, setLoadDate] = useState("");
   const [isLoadingQuote, setIsLoadingQuote] = useState(false);
+  const [availableKits, setAvailableKits] = useState<any[]>([]);
 
   useEffect(() => {
     // Set draft numbering
@@ -67,6 +68,13 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     fetch(`/catalog-${vendor.toLowerCase()}.json`)
       .then(res => res.json())
       .then(setCatalog);
+
+    // Load predefined kits
+    fetch('/predefined-kits.json')
+      .then(res => res.json())
+      .then(data => {
+        setAvailableKits(data[vendor.toLowerCase()] || []);
+      });
   }, [vendor]);
 
   const handleSelect = (item: CatalogItem, qty: number, customPrice?: number, customDescription?: string) => {
@@ -543,13 +551,13 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
                 <p className="text-slate-500 text-sm">Quickly load standard configurations for optimized performance.</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {(vendor === 'SCHROEDER' ? ['SCH1', 'SCH2', 'SCH3'] : ['PH1', 'PH2', 'PH3']).map(kit => (
+                {availableKits.map(kit => (
                   <button
-                    key={kit}
-                    onClick={() => handleLoadKit(kit)}
+                    key={kit.id}
+                    onClick={() => handleLoadKit(kit.name)}
                     className="px-4 py-2 bg-white hover:bg-blue-600 hover:text-white text-slate-700 rounded-xl text-xs font-bold border border-slate-200 hover:border-blue-600 transition-all shadow-sm"
                   >
-                    Load {kit}
+                    Load {kit.name}
                   </button>
                 ))}
               </div>
