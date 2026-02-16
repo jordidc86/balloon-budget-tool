@@ -64,13 +64,14 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     const year = new Date().getFullYear();
     setQuotationNumber(`${year}-DRAFT`);
 
+    const cacheBuster = `?v=${Date.now()}`;
     // Load catalog
-    fetch(`/catalog-${vendor.toLowerCase()}.json`)
+    fetch(`/catalog-${vendor.toLowerCase()}.json${cacheBuster}`)
       .then(res => res.json())
       .then(setCatalog);
 
     // Load predefined kits
-    fetch('/predefined-kits.json')
+    fetch(`/predefined-kits.json${cacheBuster}`)
       .then(res => res.json())
       .then(data => {
         setAvailableKits(data[vendor.toLowerCase()] || []);
@@ -120,7 +121,8 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
 
   const handleLoadKit = async (kitName: string) => {
     try {
-      const res = await fetch('/predefined-kits.json');
+      const cacheBuster = `?v=${Date.now()}`;
+      const res = await fetch(`/predefined-kits.json${cacheBuster}`);
       const kits = await res.json();
       const vendorKits = kits[vendor.toLowerCase()];
       const kit = vendorKits.find((k: any) => k.name === kitName);
@@ -352,9 +354,9 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
             0: { cellWidth: 10, halign: 'center' },
             1: { cellWidth: 35, fontStyle: 'bold' },
             2: { cellWidth: 70, fontSize: 8 },
-            3: { cellWidth: 32, halign: 'right' },
+            3: { cellWidth: 28, halign: 'right' },
             4: { cellWidth: 12, halign: 'center' },
-            5: { cellWidth: 32, halign: 'right', fontStyle: 'bold' }
+            5: { cellWidth: 25, halign: 'right', fontStyle: 'bold' }
         },
         styles: { fontSize: 9, cellPadding: 4, lineColor: [200, 200, 200] },
         alternateRowStyles: { fillColor: [252, 252, 252] },
@@ -449,10 +451,13 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
       }
     }
 
-    doc.save(`Quotation_${vendor}_${clientDetails.name || 'Draft'}_${formatDate(new Date()).replace(/\//g, '-')}.pdf`);
-    } catch (e) {
+    // Clean filename
+    const safeName = (clientDetails.name || 'Draft').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const safeRef = currentNum.replace(/[^a-z0-9]/gi, '_');
+    doc.save(`Quotation_${vendor}_${safeRef}_${safeName}.pdf`);
+    } catch (e: any) {
       console.error("PDF Error:", e);
-      alert("An error occurred during PDF generation.");
+      alert(`An error occurred during PDF generation: ${e?.message || 'Check console for details'}`);
     } finally {
       setIsGenerating(false);
     }
