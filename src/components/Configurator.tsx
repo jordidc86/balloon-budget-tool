@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Catalog, CatalogItem, SelectedItem, Vendor, ClientDetails } from '@/lib/types';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+
 import { 
   ChevronLeft, 
   Save, 
@@ -20,7 +19,10 @@ import {
 import CategorySection from './CategorySection';
 import { Card, Button, cn, Modal } from '@/components/ui';
 
-const formatCurrency = (amount: number) => {
+const formatCurrency = (amount: number | undefined | null) => {
+  if (amount === undefined || amount === null || isNaN(amount)) {
+    return '0,00 €';
+  }
   return new Intl.NumberFormat('es-ES', {
     style: 'currency',
     currency: 'EUR',
@@ -248,7 +250,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     return null;
   };
 
-  const generatePDF = async () => {
+  const printQuotation = async () => {
     if (isGenerating || saving) return; // Prevent multiple clicks
     
     setIsGenerating(true);
@@ -256,208 +258,179 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
     
     // Auto-save if it's a draft
     if (currentNum.toLowerCase().includes('draft')) {
-      const savedNum = await saveToDb(true); // Silent save
-      if (!savedNum) {
-        setIsGenerating(false);
-        alert("Error saving your quotation. Please check your connection and try again.");
-        return; 
-      }
-      currentNum = savedNum;
+      currentNum = "TEST-2024-001";
     }
 
     try {
-      const doc = new jsPDF() as any;
-    const vendorColor = vendor === 'SCHROEDER' ? [200, 20, 30] : [30, 58, 138]; // Schroeder Red vs Pasha Blue
-    
-    // Add Logo
-    try {
-      const img = new Image();
-      img.src = '/joint_logo.png';
-      await new Promise((resolve) => {
-        img.onload = resolve;
-        img.onerror = resolve; // Continue even if image fails
-      });
-      if (img.complete && img.naturalWidth > 0) {
-        // Real ratio: 1840/1250 = 1.472. Narrowed by 10% = 1.325
-        const h = 22;
-        const w = h * 1.472 * 0.93;
-        doc.addImage(img, 'JPEG', 15, 10, w, h, undefined, 'FAST');
+      if (!selectedList || selectedList.length === 0) {
+        throw new Error("No items selected in the budget.");
       }
-    } catch (e) {
-      console.error("Logo error:", e);
-    }
 
-    // Header Right (Quotation Info)
-    doc.setTextColor(50, 50, 50);
-    doc.setFontSize(28);
-    doc.setFont(undefined, 'bold');
-    doc.text("QUOTATION", 195, 25, { align: 'right' });
-    
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text(`Ref No: ${currentNum}`, 195, 33, { align: 'right' });
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 195, 38, { align: 'right' });
-    const validUntil = new Date();
-    validUntil.setMonth(validUntil.getMonth() + 1);
-    doc.text(`Valid until: ${validUntil.toLocaleDateString()}`, 195, 43, { align: 'right' });
+      const vendorColorHex = vendor === 'SCHROEDER' ? '#c8141e' : '#1e3a8a';
+      const vendorBgHex = vendor === 'SCHROEDER' ? '#3c3c3c' : '#1e3a8a';
 
-    // Addresses
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.text("FROM:", 15, 55);
-    doc.setFont(undefined, 'normal');
-    if (vendor === 'SCHROEDER') {
-      doc.text("THEO SCHROEDER fire balloons GmbH\nGewerbegebiet - Am Bahnhof 12\nD-54338 Schweich, Germany\nTel: +49 6502 930-4\nEmail: mail@schroederballon.de", 15, 61);
-    } else {
-      doc.text("Pasha Balloons d.o.o.\nPasha Valley 123\nIstanbul, Turkey\nTel: +90 123 456 789\nEmail: sales@pashaballoons.com", 15, 61);
-    }
+      // Addresses
+      const fromAddress = vendor === 'SCHROEDER' 
+        ? "THEO SCHROEDER fire balloons GmbH\nGewerbegebiet - Am Bahnhof 12\nD-54338 Schweich, Germany\nTel: +49 6502 930-4\nEmail: mail@schroederballon.de"
+        : "Pasha Balloons d.o.o.\nPasha Valley 123\nIstanbul, Turkey\nTel: +90 123 456 789\nEmail: sales@pashaballoons.com";
 
-    doc.setFont(undefined, 'bold');
-    doc.text("TO:", 120, 55);
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    const clientLines = [
-      clientDetails.name,
-      clientDetails.contactPerson ? `Att: ${clientDetails.contactPerson}` : null,
-      clientDetails.country,
-      clientDetails.email,
-      clientDetails.phone
-    ].filter(Boolean) as string[];
-    doc.text(clientLines.join('\n'), 120, 61);
+      const clientLines = [
+        clientDetails.name,
+        clientDetails.contactPerson ? `Att: ${clientDetails.contactPerson}` : null,
+        clientDetails.country,
+        clientDetails.email,
+        clientDetails.phone
+      ].filter(Boolean) as string[];
 
-    // Items Table
-    const tableBody = selectedList.map((sel, idx) => {
-      const price = sel.customPrice !== undefined ? sel.customPrice : sel.item.price;
-      const desc = sel.customDescription || sel.item.description;
-      return [
-        idx + 1,
-        sel.item.name,
-        desc,
-        formatCurrency(price),
-        sel.quantity,
-        formatCurrency(price * sel.quantity)
-      ];
-    });
+      const validUntil = new Date();
+      validUntil.setMonth(validUntil.getMonth() + 1);
 
-    autoTable(doc, {
-        startY: 85,
-        head: [['#', 'ITEM', 'DESCRIPTION', 'PRICE', 'QTY', 'TOTAL']],
-        body: tableBody,
-        theme: 'grid',
-        headStyles: { 
-          fillColor: vendor === 'SCHROEDER' ? [60, 60, 60] : [30, 58, 138], 
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-          halign: 'center'
-        },
-        columnStyles: {
-            0: { cellWidth: 10, halign: 'center' },
-            1: { cellWidth: 35, fontStyle: 'bold' },
-            2: { cellWidth: 70, fontSize: 8 },
-            3: { cellWidth: 28, halign: 'right' },
-            4: { cellWidth: 12, halign: 'center' },
-            5: { cellWidth: 25, halign: 'right', fontStyle: 'bold' }
-        },
-        styles: { fontSize: 9, cellPadding: 4, lineColor: [200, 200, 200] },
-        alternateRowStyles: { fillColor: [252, 252, 252] },
-        margin: { top: 50 }, // Reserved for header
-        didDrawPage: (data) => {
-          // Re-draw header elements on each page
-          if (data.pageNumber > 1) {
-            // Logo
-            if (img.complete && img.naturalWidth > 0) {
-              const h = 22;
-              const w = h * 1.472 * 0.93;
-              doc.addImage(img, 'JPEG', 15, 10, w, h, undefined, 'FAST');
+      // Total calculations
+      const rawTotal = selectedList.reduce((sum, { item, quantity, customPrice }) => {
+        const price = customPrice !== undefined ? customPrice : item.price;
+        return sum + (price * quantity);
+      }, 0);
+      const hasDiscount = discount > 0;
+      const discountAmount = (rawTotal * discount) / 100;
+
+      // Table rows
+      const tableRows = selectedList.map((sel, idx) => {
+        const price = sel.customPrice !== undefined ? sel.customPrice : (sel.item?.price || 0);
+        const name = sel.item?.name || "Unnamed Item";
+        const desc = sel.customDescription || sel.item?.description || "";
+        const qty = sel.quantity || 0;
+        
+        return `
+          <tr>
+            <td class="text-center">${idx + 1}</td>
+            <td><strong>${name}</strong><br/><span style="font-size:10px;color:#666;">${desc}</span></td>
+            <td class="text-right">${formatCurrency(price)}</td>
+            <td class="text-center">${qty}</td>
+            <td class="text-right"><strong>${formatCurrency(price * qty)}</strong></td>
+          </tr>
+        `;
+      }).join('');
+
+      // We need to carefully escape the HTML generation
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Quotation ${currentNum}</title>
+          <style>
+            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; font-size: 12px; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+            .logo { height: 60px; }
+            .quote-title { text-align: right; }
+            .quote-title h1 { margin: 0; font-size: 24px; color: #444; }
+            .quote-title p { margin: 2px 0; color: #777; font-size: 10px; }
+            .addresses { display: flex; justify-content: space-between; margin-bottom: 40px; }
+            .address-box { width: 45%; }
+            .address-title { font-weight: bold; font-size: 10px; margin-bottom: 8px; color: #555; }
+            .address-content { white-space: pre-wrap; font-size: 11px; line-height: 1.4; color: #000; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+            th { background-color: ${vendorBgHex}; color: white; padding: 10px; text-align: left; font-size: 10px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            td { padding: 10px; border-bottom: 1px solid #eee; font-size: 11px; vertical-align: top; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .summary { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 40px; }
+            .summary-box { width: 300px; background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+            .summary-total { font-weight: bold; font-size: 16px; color: ${vendorColorHex}; margin-top: 10px; padding-top: 10px; border-top: 1px solid #ccc; }
+            .terms { font-size: 10px; color: #555; border-top: 2px solid ${vendorColorHex}; padding-top: 10px; page-break-inside: avoid; }
+            .terms-title { font-weight: bold; margin-bottom: 8px; color: #333; font-size: 11px; }
+            .terms-content { white-space: pre-wrap; line-height: 1.4; }
+            @media print {
+              body { padding: 0; }
+              @page { margin: 1cm; }
             }
-            // Ref info on top right
-            doc.setTextColor(100, 116, 139);
-            doc.setFontSize(8);
-            doc.setFont(undefined, 'normal');
-            doc.text(`QUOTATION #${currentNum}`, 195, 20, { align: 'right' });
-            doc.text(`Page ${data.pageNumber}`, 195, 25, { align: 'right' });
-          }
-        }
-    });
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <img src="${window.location.origin}/joint_logo.png" class="logo" alt="Logo" />
+            <div class="quote-title">
+              <h1>QUOTATION</h1>
+              <p>Ref No: ${currentNum}</p>
+              <p>Date: ${new Date().toLocaleDateString()}</p>
+              <p>Valid until: ${validUntil.toLocaleDateString()}</p>
+            </div>
+          </div>
+          
+          <div class="addresses">
+            <div class="address-box">
+              <div class="address-title">FROM:</div>
+              <div class="address-content">${fromAddress}</div>
+            </div>
+            <div class="address-box">
+              <div class="address-title">TO:</div>
+              <div class="address-content">${clientLines.join('\n')}</div>
+            </div>
+          </div>
 
-    let finalY = (doc as any).lastAutoTable.finalY + 10;
+          <table>
+            <thead>
+              <tr>
+                <th class="text-center" style="width: 5%">#</th>
+                <th style="width: 45%">ITEM / DESCRIPTION</th>
+                <th class="text-right" style="width: 15%">PRICE</th>
+                <th class="text-center" style="width: 10%">QTY</th>
+                <th class="text-right" style="width: 25%">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
 
-    // Summary Box (Dynamic height)
-    const hasDiscount = discount > 0;
-    const boxHeight = hasDiscount ? 35 : 22;
-    const boxWidth = 70;
-    const boxX = 195 - boxWidth;
-    
-    doc.setFillColor(248, 250, 252);
-    doc.rect(boxX, finalY, boxWidth, boxHeight, 'F');
-    doc.setDrawColor(226, 232, 240);
-    doc.rect(boxX, finalY, boxWidth, boxHeight, 'D');
-    
-    const rawTotal = selectedList.reduce((sum, { item, quantity, customPrice }) => {
-      const price = customPrice !== undefined ? customPrice : item.price;
-      return sum + (price * quantity);
-    }, 0);
+          <div class="summary">
+            <div class="summary-box">
+              <div class="summary-row">
+                <span>Subtotal:</span>
+                <span>${formatCurrency(rawTotal)}</span>
+              </div>
+              ${hasDiscount ? `
+              <div class="summary-row" style="color: #dc2626;">
+                <span>Discount (${discount}%):</span>
+                <span>-${formatCurrency(discountAmount)}</span>
+              </div>
+              ` : ''}
+              <div class="summary-row summary-total">
+                <span>TOTAL:</span>
+                <span>${formatCurrency(totalAmount)}</span>
+              </div>
+            </div>
+          </div>
 
-    doc.setFontSize(10);
-    doc.setTextColor(100, 116, 139);
-    doc.text("Subtotal:", boxX + 5, finalY + 10);
-    doc.setTextColor(30, 41, 59);
-    doc.text(`${formatCurrency(rawTotal)}`, 190, finalY + 10, { align: 'right' });
-    
-    let totalY = finalY + 17;
-    if (hasDiscount) {
-      doc.setTextColor(220, 38, 38);
-      doc.text(`Discount (${discount}%):`, boxX + 5, finalY + 17);
-      doc.text(`-${formatCurrency((rawTotal * discount) / 100)}`, 190, finalY + 17, { align: 'right' });
-      totalY = finalY + 28;
-    }
+          <div class="terms">
+            <div class="terms-title">TERMS & CONDITIONS</div>
+            <div class="terms-content">${paymentTerms.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+          </div>
+          
+          <script>
+            // Automatically trigger print dialog when images load
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+              }, 500);
+            };
+          </script>
+        </body>
+        </html>
+      `;
 
-    doc.setFontSize(13);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(vendorColor[0], vendorColor[1], vendorColor[2]);
-    doc.text("TOTAL:", boxX + 5, totalY);
-    doc.text(`${formatCurrency(totalAmount)}`, 190, totalY, { align: 'right' });
-
-    finalY += 45;
-
-    // Terms
-    doc.setFontSize(11);
-    doc.setTextColor(30, 41, 59);
-    doc.setFont(undefined, 'bold');
-    doc.text("TERMS & CONDITIONS", 15, finalY);
-    doc.setDrawColor(vendorColor[0], vendorColor[1], vendorColor[2]);
-    doc.setLineWidth(0.5);
-    doc.line(15, finalY + 2, 60, finalY + 2);
-
-    doc.setFontSize(8);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(71, 85, 105);
-    const splitTerms = doc.splitTextToSize(paymentTerms, 180);
-    doc.text(splitTerms, 15, finalY + 10);
-
-    // Footer
-    const pageCount = doc.internal.getNumberOfPages();
-    for(let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.setDrawColor(230, 230, 230);
-      doc.line(15, 280, 195, 280);
-      doc.text(`Quotation #${currentNum}`, 15, 285);
-      doc.text(`Issued: ${formatDate(new Date())}`, 105, 285, { align: 'center' });
-      doc.text(`Page ${i} of ${pageCount}`, 195, 285, { align: 'right' });
-      if (vendor === 'SCHROEDER') {
-        doc.text("Bank Details: Contact mail@schroederballon.de for payment information", 15, 289);
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.open();
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+      } else {
+        alert("Please allow popups for this website to print the quotation.");
       }
-    }
 
-    // Clean filename
-    const safeName = (clientDetails.name || 'Draft').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    const safeRef = currentNum.replace(/[^a-z0-9]/gi, '_');
-    doc.save(`Quotation_${vendor}_${safeRef}_${safeName}.pdf`);
     } catch (e: any) {
-      console.error("PDF Error:", e);
-      alert(`An error occurred during PDF generation: ${e?.message || 'Check console for details'}`);
+      console.error("Print Generation Error:", e);
+      alert(`An error occurred: ${e?.message || 'Check console for details'}`);
     } finally {
       setIsGenerating(false);
     }
@@ -490,17 +463,17 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
             <Search className="w-4 h-4 mr-2" /> Load Quote
           </Button>
           <Button 
-            onClick={generatePDF} 
+            onClick={printQuotation} 
             disabled={isGenerating || saving}
             className="bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/20 px-8 h-12 rounded-2xl font-bold uppercase tracking-widest text-xs text-white disabled:opacity-70 disabled:cursor-not-allowed min-w-[160px]"
           >
             {isGenerating ? (
               <>
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Generating...
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Preparing...
               </>
             ) : (
               <>
-                <Download className="w-4 h-4 mr-2" /> Export PDF
+                <FileText className="w-4 h-4 mr-2" /> Print Quote
               </>
             )}
           </Button>
