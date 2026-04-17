@@ -96,7 +96,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
 
   const totalAmount = useMemo(() => {
     const rawTotal = selectedList.reduce((sum, { item, quantity, customPrice }) => {
-      const price = customPrice !== undefined ? customPrice : item.price;
+      const price = customPrice !== undefined ? customPrice : (item?.price || 0);
       return sum + (price * quantity);
     }, 0);
     const discountAmount = (rawTotal * discount) / 100;
@@ -287,7 +287,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
 
       // Total calculations
       const rawTotal = selectedList.reduce((sum, { item, quantity, customPrice }) => {
-        const price = customPrice !== undefined ? customPrice : item.price;
+        const price = customPrice !== undefined ? customPrice : (item?.price || 0);
         return sum + (price * quantity);
       }, 0);
       const hasDiscount = discount > 0;
@@ -404,7 +404,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
 
           <div class="terms">
             <div class="terms-title">TERMS & CONDITIONS</div>
-            <div class="terms-content">${paymentTerms.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+            <div class="terms-content">${String(paymentTerms || "").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
           </div>
           
           <script>
@@ -632,7 +632,7 @@ export default function Configurator({ vendor, onBack }: { vendor: Vendor, onBac
 
               <div className="space-y-3 pt-6 border-t border-slate-100">
                   <span>Gross Subtotal</span>
-                  <span className="font-mono text-slate-900">{formatCurrency(selectedList.reduce((s, {item, quantity, customPrice}) => s + ((customPrice ?? item.price) * quantity), 0))}</span>
+                  <span className="font-mono text-slate-900">{formatCurrency(selectedList.reduce((s, {item, quantity, customPrice}) => s + ((customPrice ?? (item?.price || 0)) * quantity), 0))}</span>
                 
                 <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Discount %</span>
