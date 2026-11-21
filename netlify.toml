@@ -4,5 +4,7 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+[functions."keep-alive"]
+  schedule = "17 */6 * * *"
 [build.environment]
   NODE_VERSION = "22"

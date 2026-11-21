@@ -1,6 +1,6 @@
 """Atomic Netlify API deploy, always draft until an explicit publish action."""
 from pathlib import Path
-import sys,json,hashlib,zipfile,io,time,urllib.request,urllib.error,concurrent.futures
+import sys,json,hashlib,zipfile,io,time,urllib.request,urllib.error,concurrent.futures,tomllib
 ROOT=Path(__file__).resolve().parents[1]
 from admin_common import netlify,project_environment,SITE_ID,token
 token_value=token()
@@ -23,6 +23,8 @@ def deploy(mode):
   data=buf.getvalue();digest=hashlib.sha256(data).hexdigest();functions[p.stem]=digest;zips[digest]=(p.stem,data)
  environment=[{'key':'QUOTATION_MODE','value':mode,'scopes':['functions'],'is_secret':False},{'key':'SUPABASE_URL','value':env['SUPABASE_URL'],'scopes':['functions'],'is_secret':False},{'key':'SUPABASE_SERVICE_ROLE_KEY','value':env['SUPABASE_SERVICE_ROLE_KEY'],'scopes':['functions'],'is_secret':True}]
  manifest={'files':files,'functions':functions,'draft':True,'async':True,'title':'Managed immutable quotation references - '+mode,'environment':environment,'functions_config':{n:{'display_name':'Quotation API' if n=='quotes' else 'Quotation database health','generator':'pashaquotes-v2'} for n in functions}}
+ settings=tomllib.loads((ROOT/'netlify.toml').read_text())
+ manifest['function_schedules']=[{'name':name,'cron':config['schedule']} for name,config in settings.get('functions',{}).items() if isinstance(config,dict) and config.get('schedule') and name in functions]
  deployment=netlify('/sites/'+SITE_ID+'/deploys','POST',manifest);identifier=deployment['id'];print('Created draft',identifier,mode,flush=True)
  for _ in range(45):
   d=netlify('/deploys/'+identifier)

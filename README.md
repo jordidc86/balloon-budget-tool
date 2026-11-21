@@ -42,4 +42,6 @@ If a concurrent editor has changed a quotation, the second save returns a confli
 
 ## Operational limits
 
-The database remains on its existing plan. The app detects database unavailability, retains drafts and supports safe retries; it cannot guarantee provider uptime or override the provider's free-plan pausing policy. No paid plan or recurring automation has been created.
+The database remains on its existing free plan. The app detects database unavailability, retains drafts and supports safe retries; it cannot guarantee provider uptime or override the provider's free-plan pausing policy. No paid plan has been activated.
+
+The owner chose the free availability-check option on 2026-11-21. Netlify runs `keep-alive` every six hours (`17 */6 * * *`, UTC). It calls the read-only production health RPC, verifies the schema and production routing, and records success or failure in function logs. It does not create or update quotations, allocate references, send emails or configure external alerts. Scheduled functions run only on published deployments; Netlify can run them manually from the function page. The schedule is defined in `netlify.toml` and is also preserved by the API deploy script. Queries reduce inactivity risk but are not a guarantee against free-plan pausing. If a pause occurs, resume the project in the Supabase dashboard; this check does not automatically resume paused projects.

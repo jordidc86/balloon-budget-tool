@@ -36,7 +36,7 @@ await fs.writeFile(
   path.join(root, "dist/_headers"),
   "/\n  Cache-Control: no-cache\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: same-origin\n  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'\n/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n",
 );
-for (const name of ["quotes", "health"])
+for (const name of ["quotes", "health", "keep-alive"])
   await build({
     entryPoints: [path.join(root, `netlify/functions/${name}.mjs`)],
     bundle: true,
