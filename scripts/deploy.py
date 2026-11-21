@@ -10,13 +10,16 @@ def raw(path,method,content):
   with urllib.request.urlopen(req,timeout=45) as r:return r.read()
  except urllib.error.HTTPError as e:raise RuntimeError(f'Upload failed HTTP {e.code}')
 def deploy(mode):
+ if mode not in ('qa','production'):raise ValueError('Expected qa or production')
  env=project_environment();files={};blobs={};zips={};functions={}
  for p in (ROOT/'dist').rglob('*'):
   if p.is_file():data=p.read_bytes();digest=hashlib.sha1(data).hexdigest();files['/'+str(p.relative_to(ROOT/'dist'))]=digest;blobs[digest]=(p,data)
  for p in (ROOT/'.deploy/functions').glob('*.js'):
   buf=io.BytesIO()
   with zipfile.ZipFile(buf,'w',zipfile.ZIP_DEFLATED) as z:
-   info=zipfile.ZipInfo(p.name);info.compress_type=zipfile.ZIP_DEFLATED;z.writestr(info,p.read_bytes())
+   # Make mode part of the artifact digest: Netlify may reuse a function with
+   # the same digest, including its deploy-scoped environment configuration.
+   info=zipfile.ZipInfo(p.name);info.compress_type=zipfile.ZIP_DEFLATED;z.writestr(info,('process.env.QUOTATION_MODE='+json.dumps(mode)+';\n').encode()+p.read_bytes())
   data=buf.getvalue();digest=hashlib.sha256(data).hexdigest();functions[p.stem]=digest;zips[digest]=(p.stem,data)
  environment=[{'key':'QUOTATION_MODE','value':mode,'scopes':['functions'],'is_secret':False},{'key':'SUPABASE_URL','value':env['SUPABASE_URL'],'scopes':['functions'],'is_secret':False},{'key':'SUPABASE_SERVICE_ROLE_KEY','value':env['SUPABASE_SERVICE_ROLE_KEY'],'scopes':['functions'],'is_secret':True}]
  manifest={'files':files,'functions':functions,'draft':True,'async':True,'title':'Managed immutable quotation references - '+mode,'environment':environment,'functions_config':{n:{'display_name':'Quotation API' if n=='quotes' else 'Quotation database health','generator':'pashaquotes-v2'} for n in functions}}
@@ -40,5 +43,8 @@ def deploy(mode):
  (ROOT/'evidence').mkdir(exist_ok=True);(ROOT/f'evidence/deploy-{mode}.json').write_text(json.dumps(receipt,indent=2));print(json.dumps(receipt,indent=2))
 if __name__=='__main__':
  if sys.argv[1]=='publish':
-  identifier=json.loads((ROOT/'evidence/deploy-production.json').read_text())['id'];d=netlify('/sites/'+SITE_ID+'/deploys/'+identifier+'/restore','POST',{});print('Published verified deployment',identifier)
+  receipt=json.loads((ROOT/'evidence/deploy-production.json').read_text());identifier=receipt['id']
+  with urllib.request.urlopen(receipt['deploy_ssl_url']+'/api/db-test',timeout=25) as response:health=json.load(response)
+  if health.get('ok') is not True or health.get('testMode') is not False:raise RuntimeError('Publication blocked: production database routing is not verified')
+  d=netlify('/sites/'+SITE_ID+'/deploys/'+identifier+'/restore','POST',{});print('Published verified deployment',identifier)
  else:deploy(sys.argv[1])
