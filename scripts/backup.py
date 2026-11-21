@@ -19,7 +19,8 @@ def snapshot(conn):
   if exists:
    data[table]=conn.execute(sql.SQL("select coalesce(jsonb_agg(to_jsonb(t)), '[]'::jsonb) from public.{} t").format(sql.Identifier(table))).fetchone()[0]
    data[table].sort(key=lambda row:canonical(row))
- identities=conn.execute("select coalesce(jsonb_agg(jsonb_build_object('id',id,'email',email,'emailConfirmedAt',email_confirmed_at)),'[]'::jsonb) from auth.users where id in (select (to_jsonb(q)->>'owner_id')::uuid from public.quotations q where to_jsonb(q)->>'owner_id' is not null)").fetchone()[0]
+ identity_ids={row.get('owner_id') for row in data['quotations']}|{row['user_id'] for row in data.get('quotation_members',[])};identity_ids.discard(None)
+ identities=conn.execute("select coalesce(jsonb_agg(jsonb_build_object('id',id,'email',email,'emailConfirmedAt',email_confirmed_at)),'[]'::jsonb) from auth.users where id::text=any(%s)",(list(identity_ids),)).fetchone()[0]
  return {'format':'pashaquotes-backup','version':1,'createdAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'tables':data,'ownerIdentities':identities}
 def create(directory):
  directory=Path(directory).resolve();directory.mkdir(parents=True,exist_ok=True,mode=0o700);directory.chmod(0o700)
@@ -52,16 +53,25 @@ def inspect(path):
  registry=data['tables']['quotation_registry'];counters={r['year']:r['last_value'] for r in data['tables']['quotation_counters']}
  if refs-{r['reference'] for r in registry}:raise ValueError('Unreserved reference')
  if any(counters.get(r['year'],-1)<r['sequence'] for r in registry):raise ValueError('Counter would reuse an issued number')
+ identities={row['id'] for row in data['ownerIdentities']}
+ required={row.get('owner_id') for row in data['tables']['quotations']}|{row['user_id'] for row in data['tables'].get('quotation_members',[])};required.discard(None)
+ if required-identities:raise ValueError('Missing ownership identity mapping')
  return data,manifest
 def verify_restore(path):
  data,manifest=inspect(path);schema='backup_check_'+uuid.uuid4().hex
  conn=connect()
  try:
   conn.execute(sql.SQL('create schema {}').format(sql.Identifier(schema)))
+  conn.execute(sql.SQL('create table {}.backup_identities(id uuid primary key)').format(sql.Identifier(schema)))
+  for identity in data['ownerIdentities']:conn.execute(sql.SQL('insert into {}.backup_identities(id) values(%s)').format(sql.Identifier(schema)),(identity['id'],))
   for table,rows in data['tables'].items():
    source=table
    if table=='Quotation' and conn.execute("select to_regclass('public.\"Quotation\"')").fetchone()[0] is None:source='pasha_legacy_archive'
    conn.execute(sql.SQL('create table {}.{} (like public.{} including defaults including constraints)').format(sql.Identifier(schema),sql.Identifier(table),sql.Identifier(source)))
+   # LIKE omits foreign keys. Check ownership links against synthetic identities
+   # while keeping authentication passwords and sessions out of the archive.
+   field='owner_id' if table=='quotations' else 'user_id' if table=='quotation_members' else None
+   if field:conn.execute(sql.SQL('alter table {}.{} add foreign key ({}) references {}.backup_identities(id)').format(sql.Identifier(schema),sql.Identifier(table),sql.Identifier(field),sql.Identifier(schema)))
    conn.execute(sql.SQL('insert into {}.{} select * from jsonb_populate_recordset(null::{}.{},%s)').format(sql.Identifier(schema),sql.Identifier(table),sql.Identifier(schema),sql.Identifier(table)),(Jsonb(rows),))
    restored=conn.execute(sql.SQL("select coalesce(jsonb_agg(to_jsonb(t)),'[]'::jsonb) from {}.{} t").format(sql.Identifier(schema),sql.Identifier(table))).fetchone()[0]
    restored.sort(key=lambda row:canonical(row))

@@ -679,6 +679,7 @@ h3 {
 }
 .history-details dt {
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 .history-details dd {
   overflow-wrap: anywhere;
