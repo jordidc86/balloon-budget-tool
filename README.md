@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PashaQuotes
 
-## Getting Started
+Maintained application for https://pashaquotes.netlify.app. This source replaces the previously unversioned production build. The original deployment is retained for inspection; do not republish its obsolete save API after the managed-write guard is enabled.
 
-First, run the development server:
+## Reference assignment
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The database assigns the reference and issue date on the first successful save. References use `YYYY-NNN`, shared across both manufacturers. Existing references are preserved exactly. Historical `202635` reserves sequence 35, alongside the legacy `2026-001` to `2026-030`; the production high-water mark was initialized to 35.
+
+A persistent UUID creation key makes retried first saves idempotent. PostgreSQL locks the creation key and the yearly counter in the same transaction as the inserted quotation. Failed transactions do not consume a number. Updates require the saved UUID and expected revision and cannot alter the reference, issue date or manufacturer. Number reservations remain in the registry even if a record is removed administratively. Revision snapshots preserve saved versions. QA uses a separate schema and `QA-` references.
+
+## Data and validation
+
+The API validates quantities, discounts and manufacturer-specific products, recalculates totals, and returns the stored canonical document. Existing issued fixed prices remain unchanged when a historic quote is edited; new products use the current catalog. The confirmed IV Open Basket price is EUR 8,350 for new quotations. Products without a known price are labeled 'Price on request' and require an agreed price, rather than being silently free.
+
+Pasha frame options are matched to the selected basket's explicit frame type. Kits use IDs and are validated in tests. Pasha's issuer is the Turkish Pasha Balloons Üretimi Anonim Şirketi; provenance is recorded in `data/issuers.json`.
+
+Access intentionally remains open at the owner's request. There is no per-representative authentication or isolation. Reference immutability is enforced independently of browser controls. Supabase service credentials are server-only; anonymous roles cannot invoke the management RPCs or edit the tables directly.
+
+## Build and tests
+
+Use Node.js 22 or later:
+
+```sh
+npm ci
+npm test
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`dist` contains the static application. Netlify functions live in `netlify/functions`. The build script also bundles standalone functions for the API deploy workflow. The committed lockfile pins dependencies.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+For database administration install `psycopg[binary]` from `scripts/requirements.txt`. Supply `DATABASE_URL`, or use the existing authenticated Netlify CLI configuration. Credentials are kept in memory. `scripts/database.py` backs up both historical tables privately, installs the additive schema and imports historical records. Do not reimport from obsolete data sources after cutover. The second migration enables the mandatory managed-save guard and must be applied at release.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`QUOTATION_MODE=qa` uses the isolated `quote_qa` schema. `scripts/run-qa.py` runs live persistence, retry, conflict and concurrency tests and verifies that official counters remain unchanged. It never sends invitations or emails. Test records are isolated from business records.
 
-## Learn More
+`python scripts/deploy.py qa` creates a draft test deployment. `python scripts/deploy.py production` creates a draft with production database routing; publishing is a separate `python scripts/deploy.py publish` action. Runtime secrets are injected only into the function environment and never written into source, bundles or receipts.
 
-To learn more about Next.js, take a look at the following resources:
+## Browser behavior
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Drafts are retained locally when storage is available. Local-storage errors do not reverse a successful database save. Save/print operations share a synchronous lock. The print window opens during the click, before any network wait; unchanged saved quotations can be reprinted without a new save or number. PDFs use the confirmed server document, escaped content, repeated table headings and rows that avoid page breaks. End-of-month validity dates are clamped correctly.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+If a concurrent editor has changed a quotation, the second save returns a conflict without overwriting it. A draft with a lost response can be retried without receiving a new number.
 
-## Deploy on Vercel
+## Operational limits
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The database remains on its existing plan. The app detects database unavailability, retains drafts and supports safe retries; it cannot guarantee provider uptime or override the provider's free-plan pausing policy. No paid plan or recurring automation has been created.

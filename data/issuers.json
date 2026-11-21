@@ -1,0 +1,24 @@
+{
+  "SCHROEDER": {
+    "name": "THEO SCHROEDER fire balloons GmbH",
+    "address": [
+      "Gewerbegebiet - Am Bahnhof 12",
+      "D-54338 Schweich, Germany"
+    ],
+    "phone": "+49 6502 930-4",
+    "email": "mail@schroederballon.de"
+  },
+  "PASHA": {
+    "name": "Pasha Balloons Üretimi Anonim Şirketi",
+    "address": [
+      "Bahçelievler Mah. Atatürk Cad. No:18",
+      "50650 Ortahisar - Ürgüp / Nevşehir, Türkiye"
+    ],
+    "phone": "+90 384 343 3400",
+    "email": "design@pashaballoons.com",
+    "sources": [
+      "https://www.pashaballoons.com/contact/",
+      "https://www.pashaballoons.com/downloads/TYPE%20CERTIFICATE%20DATA%20SHEET%20-%20PASHA%20SERIES%20REV.5.pdf"
+    ]
+  }
+}

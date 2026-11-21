@@ -1,9 +1,8 @@
 [build]
   command = "npm run build"
-  publish = ".next"
-
+  publish = "dist"
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 [build.environment]
-  NEXT_USE_NETLIFY_EDGE = "true"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+  NODE_VERSION = "22"
