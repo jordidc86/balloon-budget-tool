@@ -1,4 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import SignIn from "./SignIn.jsx";
+import History from "./History.jsx";
+import { accessToken } from "./auth-client.js";
 import {
   catalogs,
   SINGLE,
@@ -13,11 +16,24 @@ import {
   normalizeDocument,
   totals,
 } from "./domain.js";
-import { readStore, writeStore, backupQuote, findBackup, restoreDraft } from "./storage.js";
+import {
+  readStore,
+  writeStore,
+  backupQuote,
+  findBackup,
+  restoreDraft,
+  userStorage,
+} from "./storage.js";
 import { showPrint } from "./print.js";
 import "./base.css";
 import "./styles.css";
-const emptyCustomer = () => ({ name: "", country: "", contactPerson: "", phone: "", email: "" });
+const emptyCustomer = () => ({
+  name: "",
+  country: "",
+  contactPerson: "",
+  phone: "",
+  email: "",
+});
 const fresh = (vendor) => ({
   vendor,
   creationKey: crypto.randomUUID(),
@@ -35,35 +51,53 @@ const editable = (d) => ({
   conditions: d.conditions,
 });
 const Button = ({ children, secondary = false, ...props }) => (
-  <button className={secondary ? "action secondary" : "action"} type="button" {...props}>
+  <button
+    className={secondary ? "action secondary" : "action"}
+    type="button"
+    {...props}
+  >
     {children}
   </button>
 );
 async function api(path, options) {
+  const token = await accessToken();
   let response;
   try {
     response = await fetch(path, {
       ...options,
       signal: AbortSignal.timeout(18000),
-      headers: { "Content-Type": "application/json", ...options?.headers },
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        Authorization: "Bearer " + token,
+      },
     });
   } catch {
     throw Object.assign(
-      new Error("The saving service could not be reached. Your draft is retained; retry safely."),
+      new Error(
+        "The saving service could not be reached. Your draft is retained; retry safely.",
+      ),
       { status: 503 },
     );
   }
   const body = await response.json().catch(() => null);
   if (!response.ok || !body?.success)
     throw Object.assign(
-      new Error(body?.error || "Could not process the quotation. Your draft is retained."),
+      new Error(
+        body?.error ||
+          "Could not process the quotation. Your draft is retained.",
+      ),
       { status: response.status, quotation: body?.quotation },
     );
   return body;
 }
-function Configurator({ vendor, onBack }) {
+function Configurator({ vendor, onBack, user, signOut }) {
   const key = "pashaquotes:draft:v2:" + vendor;
-  const [draft, setDraft] = useState(() => restoreDraft(key, vendor, () => fresh(vendor)));
+  const storage = useMemo(() => userStorage(user.id), [user.id]);
+  const [draft, setDraft] = useState(() =>
+    restoreDraft(key, vendor, () => fresh(vendor), storage),
+  );
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [notice, setNotice] = useState(null),
     [busy, setBusy] = useState(false),
     [localFailure, setLocalFailure] = useState(false),
@@ -74,13 +108,17 @@ function Configurator({ vendor, onBack }) {
   const current = useRef(draft);
   current.current = draft;
   const dirty =
-    !draft.saved || JSON.stringify(editable(draft)) !== JSON.stringify(editable(draft.saved));
+    !draft.saved ||
+    JSON.stringify(editable(draft)) !== JSON.stringify(editable(draft.saved));
   useEffect(() => {
-    setLocalFailure(!writeStore(key, draft));
+    setLocalFailure(!writeStore(key, draft, storage));
   }, [key, draft]);
   useEffect(() => {
     let active = true;
-    fetch("/api/db-test", { signal: AbortSignal.timeout(12000), cache: "no-store" })
+    fetch("/api/db-test", {
+      signal: AbortSignal.timeout(12000),
+      cache: "no-store",
+    })
       .then((r) => r.json().then((b) => ({ r, b })))
       .then(({ r, b }) => {
         if (active) {
@@ -108,7 +146,10 @@ function Configurator({ vendor, onBack }) {
     setNotice(null);
   }
   function updateCustomer(field, value) {
-    setDraft((d) => ({ ...d, customerData: { ...d.customerData, [field]: value } }));
+    setDraft((d) => ({
+      ...d,
+      customerData: { ...d.customerData, [field]: value },
+    }));
     setNotice(null);
   }
   function applyQuote(q) {
@@ -116,7 +157,10 @@ function Configurator({ vendor, onBack }) {
     return q;
   }
   async function saveCloud() {
-    const normalized = normalizeDocument(editable(current.current), current.current.saved);
+    const normalized = normalizeDocument(
+      editable(current.current),
+      current.current.saved,
+    );
     const saved = current.current.saved;
     let body;
     try {
@@ -140,9 +184,11 @@ function Configurator({ vendor, onBack }) {
     }
     const q = body.quotation;
     if (!q?.id || !q.quotationNumber || !q.revision)
-      throw new Error("The server did not confirm the saved reference. Retry this draft.");
+      throw new Error(
+        "The server did not confirm the saved reference. Retry this draft.",
+      );
     applyQuote(q);
-    const backed = backupQuote(q);
+    const backed = backupQuote(q, storage);
     setHealth("OK");
     setTestMode(Boolean(body.testMode));
     setNotice({
@@ -175,17 +221,24 @@ function Configurator({ vendor, onBack }) {
     }
     const popup = window.open("", "_blank");
     if (!popup) {
-      setNotice({ type: "error", text: "Allow popups for this site and press Print again." });
+      setNotice({
+        type: "error",
+        text: "Allow popups for this site and press Print again.",
+      });
       return;
     }
-    popup.document.write('<p style="font:16px Arial;padding:30px">Preparing quotation...</p>');
+    popup.document.write(
+      '<p style="font:16px Arial;padding:30px">Preparing quotation...</p>',
+    );
     working.current = true;
     setBusy(true);
     setNotice(null);
     try {
       const q = dirty ? await saveCloud() : draft.saved;
       if (!q?.id || !q.quotationNumber)
-        throw new Error("Save the quotation to obtain a confirmed reference before printing.");
+        throw new Error(
+          "Save the quotation to obtain a confirmed reference before printing.",
+        );
       await showPrint(popup, q, window.location.origin);
     } catch (e) {
       popup.close();
@@ -199,7 +252,9 @@ function Configurator({ vendor, onBack }) {
     if (
       dirty &&
       draft.items.length &&
-      !window.confirm("Start a new quotation and discard the current unsaved changes?")
+      !window.confirm(
+        "Start a new quotation and discard the current unsaved changes?",
+      )
     )
       return;
     const next = fresh(vendor);
@@ -221,13 +276,17 @@ function Configurator({ vendor, onBack }) {
       try {
         const body = await api(
           "/api/quotations?" +
-            new URLSearchParams({ vendor, number: load.number.trim(), date: load.date }),
+            new URLSearchParams({
+              vendor,
+              number: load.number.trim(),
+              date: load.date,
+            }),
         );
         q = body.quotation;
         setTestMode(Boolean(body.testMode));
       } catch (e) {
         if (e.status < 500) throw e;
-        q = findBackup(vendor, load.number.trim(), load.date);
+        q = findBackup(vendor, load.number.trim(), load.date, storage);
         if (!q?.id || !q.revision) throw e;
         setNotice({
           type: "warning",
@@ -235,11 +294,14 @@ function Configurator({ vendor, onBack }) {
         });
       }
       applyQuote(q);
-      backupQuote(q);
+      backupQuote(q, storage);
       setLoad(null);
       setNotice(
         (n) =>
-          n || { type: "success", text: `Loaded ${q.quotationNumber}, revision ${q.revision}.` },
+          n || {
+            type: "success",
+            text: `Loaded ${q.quotationNumber}, revision ${q.revision}.`,
+          },
       );
     } catch (e) {
       setNotice({ type: "error", text: e.message });
@@ -274,7 +336,10 @@ function Configurator({ vendor, onBack }) {
     Number.isFinite(Number(draft.discount)) &&
     Number(draft.discount) >= 0 &&
     Number(draft.discount) <= 100;
-  const summary = totals(draft.items, discountValid ? Number(draft.discount) : 0);
+  const summary = totals(
+    draft.items,
+    discountValid ? Number(draft.discount) : 0,
+  );
   return (
     <div className="app-shell">
       {testMode && (
@@ -293,7 +358,9 @@ function Configurator({ vendor, onBack }) {
                 localFailure &&
                 dirty &&
                 draft.items.length &&
-                !window.confirm("Local storage is unavailable. Leave this unsaved quotation?")
+                !window.confirm(
+                  "Local storage is unavailable. Leave this unsaved quotation?",
+                )
               )
                 return;
               onBack();
@@ -305,11 +372,18 @@ function Configurator({ vendor, onBack }) {
             <h1>{vendor} CONFIGURATOR</h1>
             <p>
               Reference:{" "}
-              <strong>{draft.saved?.quotationNumber || "Assigned automatically when saved"}</strong>
+              <strong>
+                {draft.saved?.quotationNumber ||
+                  "Assigned automatically when saved"}
+              </strong>
             </p>
           </div>
         </div>
         <div className="toolbar">
+          <span className="signed-in-email">{user.email}</span>
+          <Button secondary disabled={busy} onClick={signOut}>
+            Sign out
+          </Button>
           <Button
             secondary
             disabled={busy}
@@ -326,7 +400,9 @@ function Configurator({ vendor, onBack }) {
         </div>
       </header>
       <div className="sub-toolbar">
-        <span className={"db-status " + health.toLowerCase()}>DB: {health}</span>
+        <span className={"db-status " + health.toLowerCase()}>
+          DB: {health}
+        </span>
         <span>
           {draft.saved
             ? dirty
@@ -335,26 +411,38 @@ function Configurator({ vendor, onBack }) {
             : "Draft · no reference assigned"}
         </span>
         <div>
+          <Button
+            secondary
+            disabled={busy || !draft.saved}
+            onClick={() => setHistoryOpen(true)}
+          >
+            Version history
+          </Button>{" "}
           <Button secondary disabled={busy} onClick={() => newQuote(false)}>
             New quotation
           </Button>{" "}
-          <Button secondary disabled={busy || !draft.items.length} onClick={() => newQuote(true)}>
+          <Button
+            secondary
+            disabled={busy || !draft.items.length}
+            onClick={() => newQuote(true)}
+          >
             Copy as new
           </Button>
         </div>
       </div>
       {localFailure && (
         <div className="message warning" role="status">
-          Your browser cannot keep a local draft. Save to the database before leaving this page.
+          Your browser cannot keep a local draft. Save to the database before
+          leaving this page.
         </div>
       )}
       {health === "FAIL" && (
         <div className="message warning" role="status">
-          Saving is temporarily unavailable. You can continue editing; retained drafts can be
-          retried without creating duplicate numbers.
+          Saving is temporarily unavailable. You can continue editing; retained
+          drafts can be retried without creating duplicate numbers.
         </div>
       )}
-      {notice && (
+      {notice && !load && (
         <div
           className={"message " + notice.type}
           role={notice.type === "error" ? "alert" : "status"}
@@ -392,7 +480,9 @@ function Configurator({ vendor, onBack }) {
           </section>
           {catalogs[vendor].categories.map((category) => {
             const available = allowedItems(vendor, category.name, draft.items);
-            const selected = draft.items.filter((s) => s.item.category === category.name);
+            const selected = draft.items.filter(
+              (s) => s.item.category === category.name,
+            );
             const single = SINGLE.has(category.name);
             return (
               <section className="category" key={category.name}>
@@ -400,9 +490,14 @@ function Configurator({ vendor, onBack }) {
                   <h3>{category.name}</h3>
                   <span>{available.length} options</span>
                 </div>
-                {!available.length && ["BASKET", "BURNER"].includes(category.name) && (
-                  <p className="message warning">No approved compatibility options are listed for this envelope. Confirm the configuration with the manufacturer before adding these components.</p>
-                )}
+                {!available.length &&
+                  ["BASKET", "BURNER"].includes(category.name) && (
+                    <p className="message warning">
+                      No approved compatibility options are listed for this
+                      envelope. Confirm the configuration with the manufacturer
+                      before adding these components.
+                    </p>
+                  )}
                 {single ? (
                   <>
                     <select
@@ -412,23 +507,33 @@ function Configurator({ vendor, onBack }) {
                         if (!e.target.value) {
                           change(
                             "items",
-                            draft.items.filter((s) => s.item.category !== category.name),
+                            draft.items.filter(
+                              (s) => s.item.category !== category.name,
+                            ),
                           );
                           return;
                         }
-                        const item = available.find((i) => i.id === e.target.value);
+                        const item = available.find(
+                          (i) => i.id === e.target.value,
+                        );
                         if (item) choose(item);
                       }}
                     >
                       <option value="">Select {category.name}...</option>
-                      {selected[0] && !available.some((i) => i.id === selected[0].item.id) && (
-                        <option value={selected[0].item.id}>
-                          {selected[0].item.name} (saved item)
-                        </option>
-                      )}
+                      {selected[0] &&
+                        !available.some(
+                          (i) => i.id === selected[0].item.id,
+                        ) && (
+                          <option value={selected[0].item.id}>
+                            {selected[0].item.name} (saved item)
+                          </option>
+                        )}
                       {available.map((i) => (
                         <option key={i.id} value={i.id}>
-                          {i.name} · {i.priceOnRequest ? "Price on request" : money(i.price)}
+                          {i.name} ·{" "}
+                          {i.priceOnRequest
+                            ? "Price on request"
+                            : money(i.price)}
                         </option>
                       ))}
                     </select>
@@ -447,7 +552,15 @@ function Configurator({ vendor, onBack }) {
                                 step="0.01"
                                 value={s.customPrice ?? ""}
                                 placeholder="Required"
-                                onChange={(e) => alter(s.item.id, "customPrice", e.target.value === "" ? undefined : Number(e.target.value))}
+                                onChange={(e) =>
+                                  alter(
+                                    s.item.id,
+                                    "customPrice",
+                                    e.target.value === ""
+                                      ? undefined
+                                      : Number(e.target.value),
+                                  )
+                                }
                               />
                             </label>
                           )}
@@ -467,21 +580,29 @@ function Configurator({ vendor, onBack }) {
                 ) : (
                   <div className="product-list">
                     {available.map((item) => {
-                      const selection = selected.find((s) => s.item.id === item.id);
+                      const selection = selected.find(
+                        (s) => s.item.id === item.id,
+                      );
                       return (
                         <div
                           key={item.id}
-                          className={"panel product " + (selection ? "selected" : "")}
+                          className={
+                            "panel product " + (selection ? "selected" : "")
+                          }
                         >
                           <label className="product-label">
                             <input
                               type="checkbox"
                               checked={Boolean(selection)}
-                              onChange={() => (selection ? remove(item.id) : choose(item))}
+                              onChange={() =>
+                                selection ? remove(item.id) : choose(item)
+                              }
                             />
                             <span>
                               <b>{item.name}</b>
-                              <span className="description">{item.description}</span>
+                              <span className="description">
+                                {item.description}
+                              </span>
                             </span>
                             <strong>
                               {item.priceOnRequest
@@ -504,26 +625,34 @@ function Configurator({ vendor, onBack }) {
                                     alter(
                                       item.id,
                                       "quantity",
-                                      e.target.value === "" ? "" : Number(e.target.value),
+                                      e.target.value === ""
+                                        ? ""
+                                        : Number(e.target.value),
                                     )
                                   }
                                 />
                               </label>
                               {item.allowCustomPrice && (
                                 <label>
-                                  {item.priceOnRequest ? "Agreed price (€)" : "Artwork price (€)"}
+                                  {item.priceOnRequest
+                                    ? "Agreed price (€)"
+                                    : "Artwork price (€)"}
                                   <input
                                     aria-label={"Price for " + item.name}
                                     type="number"
                                     min="0"
                                     step="0.01"
                                     value={selection.customPrice ?? ""}
-                                    placeholder={item.priceOnRequest ? "Required" : "0.00"}
+                                    placeholder={
+                                      item.priceOnRequest ? "Required" : "0.00"
+                                    }
                                     onChange={(e) =>
                                       alter(
                                         item.id,
                                         "customPrice",
-                                        e.target.value === "" ? undefined : Number(e.target.value),
+                                        e.target.value === ""
+                                          ? undefined
+                                          : Number(e.target.value),
                                       )
                                     }
                                   />
@@ -536,7 +665,11 @@ function Configurator({ vendor, onBack }) {
                                   value={selection.customDescription || ""}
                                   maxLength="3000"
                                   onChange={(e) =>
-                                    alter(item.id, "customDescription", e.target.value)
+                                    alter(
+                                      item.id,
+                                      "customDescription",
+                                      e.target.value,
+                                    )
                                   }
                                 />
                               </label>
@@ -579,18 +712,20 @@ function Configurator({ vendor, onBack }) {
               <label>
                 Reference
                 <output className="readonly" aria-label="Quotation reference">
-                  {draft.saved?.quotationNumber || "Pending automatic assignment"}
+                  {draft.saved?.quotationNumber ||
+                    "Pending automatic assignment"}
                 </output>
               </label>
               <label>
                 Issue date
                 <output className="readonly" aria-label="Issue date">
-                  {draft.saved?.dateOfIssue || "Assigned by server on first save"}
+                  {draft.saved?.dateOfIssue ||
+                    "Assigned by server on first save"}
                 </output>
               </label>
               <p className="help">
-                The reference and issue date cannot be changed. Copy a saved quotation to issue a
-                new one.
+                The reference and issue date cannot be changed. Copy a saved
+                quotation to issue a new one.
               </p>
             </section>
             <section className="panel detail-panel">
@@ -634,14 +769,23 @@ function Configurator({ vendor, onBack }) {
                   step="0.01"
                   value={draft.discount}
                   onChange={(e) =>
-                    change("discount", e.target.value === "" ? "" : Number(e.target.value))
+                    change(
+                      "discount",
+                      e.target.value === "" ? "" : Number(e.target.value),
+                    )
                   }
                 />
               </label>
-              {!discountValid && <p className="error-text">Discount must be between 0 and 100.</p>}
+              {!discountValid && (
+                <p className="error-text">
+                  Discount must be between 0 and 100.
+                </p>
+              )}
               <div className="total-line net">
                 <span>NET TOTAL</span>
-                <strong>{discountValid ? money(summary.netTotal) : "Invalid discount"}</strong>
+                <strong>
+                  {discountValid ? money(summary.netTotal) : "Invalid discount"}
+                </strong>
               </div>
             </section>
             <section className="panel detail-panel">
@@ -660,6 +804,13 @@ function Configurator({ vendor, onBack }) {
           </div>
         </aside>
       </fieldset>
+      {historyOpen && draft.saved && (
+        <History
+          quotation={draft.saved}
+          request={api}
+          onClose={() => setHistoryOpen(false)}
+        />
+      )}
       {load && (
         <div className="modal-backdrop">
           <section
@@ -677,6 +828,7 @@ function Configurator({ vendor, onBack }) {
               ×
             </button>
             <p>Enter the saved reference and issue date.</p>
+            {notice?.type==="error"&&<p className="message error" role="alert">{notice.text}</p>}
             <form onSubmit={retrieve}>
               <label>
                 Reference
@@ -686,7 +838,9 @@ function Configurator({ vendor, onBack }) {
                   required
                   maxLength="100"
                   value={load.number}
-                  onChange={(e) => setLoad((d) => ({ ...d, number: e.target.value }))}
+                  onChange={(e) =>
+                    setLoad((d) => ({ ...d, number: e.target.value }))
+                  }
                 />
               </label>
               <label>
@@ -696,7 +850,9 @@ function Configurator({ vendor, onBack }) {
                   type="date"
                   required
                   value={load.date}
-                  onChange={(e) => setLoad((d) => ({ ...d, date: e.target.value }))}
+                  onChange={(e) =>
+                    setLoad((d) => ({ ...d, date: e.target.value }))
+                  }
                 />
               </label>
               <button className="action" type="submit" disabled={busy}>
@@ -709,17 +865,34 @@ function Configurator({ vendor, onBack }) {
     </div>
   );
 }
-export default function App() {
+function Workspace({ user, signOut }) {
   const [vendor, setVendor] = useState(null);
   return vendor ? (
-    <Configurator key={vendor} vendor={vendor} onBack={() => setVendor(null)} />
+    <Configurator
+      key={user.id + vendor}
+      vendor={vendor}
+      onBack={() => setVendor(null)}
+      user={user}
+      signOut={signOut}
+    />
   ) : (
     <main className="landing">
+      <div className="account-bar">
+        <span>{user.email}</span>
+        <Button secondary onClick={signOut}>
+          Sign out
+        </Button>
+      </div>
       <h1>BALLOON BUDGET TOOL</h1>
       <p className="tagline">Schroeder &amp; Pasha Manufacturers</p>
       <div className="brand-grid">
         {["SCHROEDER", "PASHA"].map((v) => (
-          <button type="button" className="panel brand" key={v} onClick={() => setVendor(v)}>
+          <button
+            type="button"
+            className="panel brand"
+            key={v}
+            onClick={() => setVendor(v)}
+          >
             <strong>{v}</strong>
             <span>ENTER CATALOG</span>
           </button>
@@ -729,5 +902,12 @@ export default function App() {
         Professional balloon quotations · References assigned automatically
       </p>
     </main>
+  );
+}
+export default function App() {
+  return (
+    <SignIn>
+      {(identity) => <Workspace key={identity.user.id} {...identity} />}
+    </SignIn>
   );
 }

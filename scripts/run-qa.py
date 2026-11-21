@@ -5,10 +5,10 @@ from admin_common import project_environment
 from database import connect
 with connect() as conn:
  before=conn.execute('select year,last_value from public.quotation_counters order by year').fetchall()
- # Install the same identity guard on QA only; production cutover is later.
- sql=(ROOT/'migrations/002-lock-issued-identities.sql').read_text();head=sql[:sql.index('drop trigger')];tail=sql[sql.index('drop trigger if exists pasha_managed_identity on quote_qa'):].split('-- Production-only')[0]
- conn.execute(head+tail,prepare=False)
+ assert conn.execute("select to_regprocedure('public.pasha_private_save(uuid,jsonb,uuid,uuid,integer,boolean)')").fetchone()[0], 'Install the additive private quotation migration first'
 env=dict(os.environ);env.update(project_environment());env['QUOTATION_MODE']='qa'
+from qa_accounts import qa_environment
+env=qa_environment(env)
 if '--deployed' in sys.argv:env['QA_BASE_URL']=json.loads((ROOT/'evidence/deploy-qa.json').read_text())['deploy_ssl_url']
 node=os.environ.get('NODE_BIN') or shutil.which('node') or '/Users/jordi/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node'
 result=subprocess.run([node,str(ROOT/'tests/qa-live.mjs')],env=env)

@@ -1,5 +1,11 @@
-import { normalizeDocument, validDate, ValidationError } from "../../src/domain.js";
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+import {
+  normalizeDocument,
+  validDate,
+  ValidationError,
+} from "../../src/domain.js";
+import { authenticatedUser } from "../../src/server/auth.mjs";
+const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const reply = (statusCode, data) => ({
   statusCode,
   headers: {
@@ -14,13 +20,22 @@ export async function rpc(name, args = {}) {
   const base = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!base || !key)
-    throw Object.assign(new Error("The saving service is not configured."), { status: 503 });
-  const response = await fetch(base.replace(/\/$/, "") + "/rest/v1/rpc/" + name, {
-    method: "POST",
-    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ ...args, p_test: testMode() }),
-    signal: AbortSignal.timeout(15000),
-  });
+    throw Object.assign(new Error("The saving service is not configured."), {
+      status: 503,
+    });
+  const response = await fetch(
+    base.replace(/\/$/, "") + "/rest/v1/rpc/" + name,
+    {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...args, p_test: testMode() }),
+      signal: AbortSignal.timeout(15000),
+    },
+  );
   const data = await response.json().catch(() => null);
   if (!response.ok) {
     console.warn("Quotation RPC failure", {
@@ -32,9 +47,11 @@ export async function rpc(name, args = {}) {
       ? 409
       : data?.code === "P0002"
         ? 404
-        : data?.code?.startsWith("22")
-          ? 400
-          : 503;
+        : data?.code === "42501"
+          ? 403
+          : data?.code?.startsWith("22")
+            ? 400
+            : 503;
     throw Object.assign(
       new Error(
         status === 503
@@ -55,11 +72,32 @@ export async function handler(event) {
       !/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)
     )
       return reply(403, { success: false, error: "Origin not permitted." });
+    const user = await authenticatedUser(event);
+    if (!(await rpc("pasha_member_access", { p_user_id: user.id })))
+      return reply(403, {
+        success: false,
+        error:
+          "Representative access is not enabled. Contact the administrator.",
+      });
+    const privateRead = (args) =>
+      rpc("pasha_private_quote", { p_user_id: user.id, ...args });
     if (event.httpMethod === "GET") {
       const p = event.queryStringParameters || {};
       if (p.id) {
-        if (!UUID.test(p.id)) throw new ValidationError("Invalid quotation identifier.");
-        const q = await rpc("pasha_read_quote_id", { p_id: p.id });
+        if (!UUID.test(p.id))
+          throw new ValidationError("Invalid quotation identifier.");
+        if (p.history) {
+          const before = p.before === undefined ? null : Number(p.before);
+          if (before !== null && (!Number.isInteger(before) || before < 1))
+            throw new ValidationError("Invalid revision cursor.");
+          const history = await rpc("pasha_private_history", {
+            p_user_id: user.id,
+            p_id: p.id,
+            p_before: before,
+          });
+          return reply(200, { success: true, ...history });
+        }
+        const q = await privateRead({ p_id: p.id });
         return q
           ? reply(200, { success: true, quotation: q, testMode: testMode() })
           : reply(404, { success: false, error: "Quotation not found." });
@@ -70,8 +108,10 @@ export async function handler(event) {
         p.number.length > 100 ||
         !validDate(p.date)
       )
-        throw new ValidationError("Manufacturer, reference and a valid issue date are required.");
-      const q = await rpc("pasha_read_quote", {
+        throw new ValidationError(
+          "Manufacturer, reference and a valid issue date are required.",
+        );
+      const q = await privateRead({
         p_vendor: p.vendor,
         p_number: p.number.trim(),
         p_date: p.date,
@@ -90,8 +130,17 @@ export async function handler(event) {
     } catch {
       throw new ValidationError("Invalid JSON request.");
     }
-    if (!data || typeof data !== "object" || Array.isArray(data) || !data.document || typeof data.document !== "object" || Array.isArray(data.document))
-      throw new ValidationError("Reload the current application before saving.");
+    if (
+      !data ||
+      typeof data !== "object" ||
+      Array.isArray(data) ||
+      !data.document ||
+      typeof data.document !== "object" ||
+      Array.isArray(data.document)
+    )
+      throw new ValidationError(
+        "Reload the current application before saving.",
+      );
     if (
       "quotationNumber" in data ||
       "quotationNumber" in data.document ||
@@ -108,15 +157,19 @@ export async function handler(event) {
         !Number.isInteger(data.expectedRevision) ||
         data.expectedRevision < 1
       )
-        throw new ValidationError("The saved quotation identifier and revision are required.");
-      existing = await rpc("pasha_read_quote_id", { p_id: data.id });
-      if (!existing) return reply(404, { success: false, error: "Quotation not found." });
+        throw new ValidationError(
+          "The saved quotation identifier and revision are required.",
+        );
+      existing = await privateRead({ p_id: data.id });
+      if (!existing)
+        return reply(404, { success: false, error: "Quotation not found." });
     } else if (!UUID.test(data.creationKey || ""))
       throw new ValidationError("A persistent draft key is required.");
     const document = normalizeDocument(data.document, existing);
     let quotation;
     try {
-      quotation = await rpc("pasha_save_quote", {
+      quotation = await rpc("pasha_private_save", {
+        p_user_id: user.id,
         p_document: document,
         p_creation_key: data.id ? null : data.creationKey,
         p_id: data.id || null,
@@ -125,9 +178,13 @@ export async function handler(event) {
     } catch (error) {
       if (error.status === 409) {
         const current = data.id
-          ? await rpc("pasha_read_quote_id", { p_id: data.id })
-          : await rpc("pasha_read_creation_key", { p_creation_key: data.creationKey });
-        return reply(409, { success: false, error: error.message, quotation: current });
+          ? await privateRead({ p_id: data.id })
+          : await privateRead({ p_creation_key: data.creationKey });
+        return reply(409, {
+          success: false,
+          error: error.message,
+          quotation: current,
+        });
       }
       throw error;
     }
