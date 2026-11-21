@@ -203,3 +203,10 @@ test('Malformed products and nonnumeric submitted totals are rejected',()=>{
     const d=base();change(d);assert.throws(()=>normalizeDocument(d),/valid product|totals/);
   }
 });
+test('The on-request Pasha flag envelope accepts an agreed price and cannot be issued free',()=>{
+  const item=allItems('PASHA').find(i=>i.name==='PF-FLAG');
+  const d={...base(),vendor:'PASHA',items:[{item,quantity:1}]};
+  assert.throws(()=>normalizeDocument(d),/agreed price/);
+  d.items[0].customPrice=12345.67;
+  assert.equal(normalizeDocument(d).netTotal,12345.67);
+});

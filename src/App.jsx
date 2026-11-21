@@ -437,6 +437,20 @@ function Configurator({ vendor, onBack }) {
                         <div>
                           <b>{s.item.name}</b>
                           <p className="description">{s.item.description}</p>
+                          {s.item.priceOnRequest && (
+                            <label>
+                              Agreed price (€)
+                              <input
+                                aria-label={"Price for " + s.item.name}
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                value={s.customPrice ?? ""}
+                                placeholder="Required"
+                                onChange={(e) => alter(s.item.id, "customPrice", e.target.value === "" ? undefined : Number(e.target.value))}
+                              />
+                            </label>
+                          )}
                         </div>
                         <strong>{money(s.customPrice ?? s.item.price)}</strong>
                         <button
