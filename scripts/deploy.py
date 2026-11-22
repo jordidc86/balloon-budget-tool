@@ -19,7 +19,9 @@ def deploy(mode):
   with zipfile.ZipFile(buf,'w',zipfile.ZIP_DEFLATED) as z:
    # Make mode part of the artifact digest: Netlify may reuse a function with
    # the same digest, including its deploy-scoped environment configuration.
-   info=zipfile.ZipInfo(p.name);info.compress_type=zipfile.ZIP_DEFLATED;z.writestr(info,('process.env.QUOTATION_MODE='+json.dumps(mode)+';\n').encode()+p.read_bytes())
+   flags={'QUOTATION_MODE':mode,'AUTH_EMAIL_READY':env.get('AUTH_EMAIL_READY','false'),'AUTH_SELF_REGISTRATION':env.get('AUTH_SELF_REGISTRATION','false')}
+   prelude=''.join('process.env.'+key+'='+json.dumps(value)+';\n' for key,value in flags.items())
+   info=zipfile.ZipInfo(p.name);info.compress_type=zipfile.ZIP_DEFLATED;z.writestr(info,prelude.encode()+p.read_bytes())
   data=buf.getvalue();digest=hashlib.sha256(data).hexdigest();functions[p.stem]=digest;zips[digest]=(p.stem,data)
  environment=[{'key':'QUOTATION_MODE','value':mode,'scopes':['functions'],'is_secret':False},{'key':'SUPABASE_URL','value':env['SUPABASE_URL'],'scopes':['functions'],'is_secret':False},{'key':'SUPABASE_SERVICE_ROLE_KEY','value':env['SUPABASE_SERVICE_ROLE_KEY'],'scopes':['functions'],'is_secret':True}]
  manifest={'files':files,'functions':functions,'draft':True,'async':True,'title':'Managed immutable quotation references - '+mode,'environment':environment,'functions_config':{n:{'display_name':'Quotation API' if n=='quotes' else 'Quotation database health','generator':'pashaquotes-v2'} for n in functions}}

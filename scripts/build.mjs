@@ -38,10 +38,8 @@ await fs.writeFile(
   path.join(root, "dist/_redirects"),
   "/api/quotations /.netlify/functions/quotes 200!\n/api/db-test /.netlify/functions/health 200!\n/api/access /.netlify/functions/access 200!\n/* /index.html 200\n",
 );
-await fs.writeFile(
-  path.join(root, "dist/_headers"),
-  "/\n  Cache-Control: no-cache\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: same-origin\n  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://uqusxqjrhksmvwliiheu.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'\n/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n",
-);
+const pageHeaders="  Cache-Control: no-cache\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: same-origin\n  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://uqusxqjrhksmvwliiheu.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'\n";
+await fs.writeFile(path.join(root,"dist/_headers"),"/\n"+pageHeaders+"/register\n"+pageHeaders+"/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n");
 for (const name of ["quotes", "health", "keep-alive", "access"])
   await build({
     entryPoints: [path.join(root, `netlify/functions/${name}.mjs`)],

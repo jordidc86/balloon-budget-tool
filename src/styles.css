@@ -656,7 +656,12 @@ h3 {
   max-height: 60vh;
   overflow-y: auto;
 }
-.history-layout article { min-width:0; max-height:60vh; overflow:auto; padding-right:8px; }
+.history-layout article {
+  min-width: 0;
+  max-height: 60vh;
+  overflow: auto;
+  padding-right: 8px;
+}
 .history-version {
   display: grid;
   gap: 5px;
@@ -717,9 +722,11 @@ h3 {
   }
   .history-layout nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-height:160px;
+    max-height: 160px;
   }
-  .history-layout article {max-height:45vh;}
+  .history-layout article {
+    max-height: 45vh;
+  }
   .history-details {
     grid-template-columns: 95px minmax(0, 1fr);
   }
@@ -729,4 +736,33 @@ h3 {
   .signed-in-email {
     max-width: 100%;
   }
+}
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 20px 0;
+}
+.auth-tabs button {
+  padding: 12px;
+  border: 1px solid #d5dce8;
+  border-radius: 10px;
+  background: white;
+  font-weight: 600;
+}
+.auth-tabs button[aria-selected="true"] {
+  background: #eef3ff;
+  border-color: #3358ce;
+  color: #203c9b;
+}
+.registration-pending {
+  display: grid;
+  gap: 15px;
+}
+.registration-pending h2 {
+  font-weight: 700;
+  font-size: 20px;
+}
+.registration-pending b {
+  overflow-wrap: anywhere;
 }

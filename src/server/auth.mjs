@@ -5,6 +5,9 @@ export function publicAuthConfig() {
       process.env.SUPABASE_ANON_KEY ||
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     passwordRecoveryConfigured: process.env.AUTH_EMAIL_READY === "true",
+    registrationConfigured:
+      process.env.AUTH_EMAIL_READY === "true" &&
+      process.env.AUTH_SELF_REGISTRATION === "true",
   };
 }
 export async function authenticatedUser(event) {
