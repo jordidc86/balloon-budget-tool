@@ -58,6 +58,8 @@ Drafts are retained locally when storage is available. Local-storage errors do n
 
 If a concurrent editor has changed a quotation, the second save returns a conflict without overwriting it. A draft with a lost response can be retried without receiving a new number.
 
+The desktop quotation overview scrolls independently of the catalogue, with its height adjusted to the visible viewport and a persistent net total. On mobile, the net total stays in a bottom bar while the catalogue uses normal page scrolling. The overview can also be scrolled with the keyboard; modal dialogs remain above the mobile total.
+
 ## Operational limits
 
 The database remains on its existing free plan. The app detects database unavailability, retains drafts and supports safe retries; it cannot guarantee provider uptime or override the provider's free-plan pausing policy. No paid plan has been activated.

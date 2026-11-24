@@ -105,6 +105,38 @@ function Configurator({ vendor, onBack, user, signOut }) {
     [health, setHealth] = useState("CHECKING"),
     [testMode, setTestMode] = useState(false);
   const working = useRef(false);
+  const summaryRef = useRef(null);
+  useEffect(() => {
+    let frame;
+    const measure = () => {
+      const panel = summaryRef.current;
+      if (!panel) return;
+      if (window.innerWidth <= 720) {
+        panel.style.removeProperty("--summary-available-height");
+        return;
+      }
+      const top = Math.max(24, panel.getBoundingClientRect().top);
+      panel.style.setProperty(
+        "--summary-available-height",
+        `${Math.max(100, window.innerHeight - top - 24)}px`,
+      );
+    };
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(summaryRef.current.closest(".app-shell"));
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    measure();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
   const current = useRef(draft);
   current.current = draft;
   const dirty =
@@ -685,122 +717,142 @@ function Configurator({ vendor, onBack, user, signOut }) {
           })}
         </div>
         <aside className="summary-column">
-          <div className="summary-sticky">
-            <section className="panel detail-panel">
-              <h3>CLIENT DETAILS</h3>
-              {[
-                ["name", "Client name"],
-                ["country", "Country"],
-                ["contactPerson", "Contact person (representative)"],
-                ["phone", "Phone"],
-                ["email", "Email"],
-              ].map(([field, label]) => (
-                <label key={field}>
-                  {label}
+          <div className="summary-sticky" ref={summaryRef}>
+            <div
+              className="summary-scroll"
+              role="region"
+              aria-label="Quotation overview"
+              tabIndex={0}
+            >
+              <section className="panel detail-panel">
+                <h3>CLIENT DETAILS</h3>
+                {[
+                  ["name", "Client name"],
+                  ["country", "Country"],
+                  ["contactPerson", "Contact person (representative)"],
+                  ["phone", "Phone"],
+                  ["email", "Email"],
+                ].map(([field, label]) => (
+                  <label key={field}>
+                    {label}
+                    <input
+                      type={field === "email" ? "email" : "text"}
+                      value={draft.customerData[field] || ""}
+                      maxLength="1000"
+                      onChange={(e) => updateCustomer(field, e.target.value)}
+                      placeholder={label}
+                    />
+                  </label>
+                ))}
+              </section>
+              <section className="panel detail-panel">
+                <h3>QUOTE DETAILS</h3>
+                <label>
+                  Reference
+                  <output className="readonly" aria-label="Quotation reference">
+                    {draft.saved?.quotationNumber ||
+                      "Pending automatic assignment"}
+                  </output>
+                </label>
+                <label>
+                  Issue date
+                  <output className="readonly" aria-label="Issue date">
+                    {draft.saved?.dateOfIssue ||
+                      "Assigned by server on first save"}
+                  </output>
+                </label>
+                <p className="help">
+                  The reference and issue date cannot be changed. Copy a saved
+                  quotation to issue a new one.
+                </p>
+              </section>
+              <section className="panel detail-panel">
+                <h3>SELECTED ITEMS</h3>
+                {!draft.items.length ? (
+                  <p className="description">Your budget is empty...</p>
+                ) : (
+                  draft.items.map((s) => (
+                    <div key={s.item.id} className="summary-item">
+                      <div>
+                        <b>{s.item.name}</b>
+                        <small>
+                          {s.quantity || "?"} ×{" "}
+                          {s.item.priceOnRequest && s.customPrice === undefined
+                            ? "Price required"
+                            : money(s.customPrice ?? s.item.price)}
+                        </small>
+                      </div>
+                      <button
+                        type="button"
+                        className="remove"
+                        aria-label={"Remove selected " + s.item.name}
+                        onClick={() => remove(s.item.id)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))
+                )}
+                <div className="total-line">
+                  <span>Gross subtotal</span>
+                  <strong>{money(summary.grossTotal)}</strong>
+                </div>
+                <label>
+                  Discount (%)
                   <input
-                    type={field === "email" ? "email" : "text"}
-                    value={draft.customerData[field] || ""}
-                    maxLength="1000"
-                    onChange={(e) => updateCustomer(field, e.target.value)}
-                    placeholder={label}
+                    aria-label="Discount percent"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={draft.discount}
+                    onChange={(e) =>
+                      change(
+                        "discount",
+                        e.target.value === "" ? "" : Number(e.target.value),
+                      )
+                    }
                   />
                 </label>
-              ))}
-            </section>
-            <section className="panel detail-panel">
-              <h3>QUOTE DETAILS</h3>
-              <label>
-                Reference
-                <output className="readonly" aria-label="Quotation reference">
-                  {draft.saved?.quotationNumber ||
-                    "Pending automatic assignment"}
-                </output>
-              </label>
-              <label>
-                Issue date
-                <output className="readonly" aria-label="Issue date">
-                  {draft.saved?.dateOfIssue ||
-                    "Assigned by server on first save"}
-                </output>
-              </label>
-              <p className="help">
-                The reference and issue date cannot be changed. Copy a saved
-                quotation to issue a new one.
-              </p>
-            </section>
-            <section className="panel detail-panel">
-              <h3>SELECTED ITEMS</h3>
-              {!draft.items.length ? (
-                <p className="description">Your budget is empty...</p>
-              ) : (
-                draft.items.map((s) => (
-                  <div key={s.item.id} className="summary-item">
-                    <div>
-                      <b>{s.item.name}</b>
-                      <small>
-                        {s.quantity || "?"} ×{" "}
-                        {s.item.priceOnRequest && s.customPrice === undefined
-                          ? "Price required"
-                          : money(s.customPrice ?? s.item.price)}
-                      </small>
-                    </div>
-                    <button
-                      type="button"
-                      className="remove"
-                      aria-label={"Remove selected " + s.item.name}
-                      onClick={() => remove(s.item.id)}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))
-              )}
-              <div className="total-line">
-                <span>Gross subtotal</span>
-                <strong>{money(summary.grossTotal)}</strong>
-              </div>
-              <label>
-                Discount (%)
-                <input
-                  aria-label="Discount percent"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.01"
-                  value={draft.discount}
-                  onChange={(e) =>
-                    change(
-                      "discount",
-                      e.target.value === "" ? "" : Number(e.target.value),
-                    )
-                  }
+                {!discountValid && (
+                  <p className="error-text">
+                    Discount must be between 0 and 100.
+                  </p>
+                )}
+                <div className="total-line net">
+                  <span>NET TOTAL</span>
+                  <strong>
+                    {discountValid ? money(summary.netTotal) : "Invalid discount"}
+                  </strong>
+                </div>
+              </section>
+              <section className="panel detail-panel">
+                <h3>PAYMENT TERMS</h3>
+                <label className="visually-hidden" htmlFor="terms">
+                  Payment terms
+                </label>
+                <textarea
+                  id="terms"
+                  value={draft.conditions}
+                  maxLength="15000"
+                  rows="8"
+                  onChange={(e) => change("conditions", e.target.value)}
                 />
-              </label>
-              {!discountValid && (
-                <p className="error-text">
-                  Discount must be between 0 and 100.
-                </p>
-              )}
-              <div className="total-line net">
-                <span>NET TOTAL</span>
-                <strong>
-                  {discountValid ? money(summary.netTotal) : "Invalid discount"}
-                </strong>
+              </section>
+            </div>
+            <div className="configuration-total">
+              <div>
+                <span>Configuration total</span>
+                <small>{draft.items.length} selected items</small>
               </div>
-            </section>
-            <section className="panel detail-panel">
-              <h3>PAYMENT TERMS</h3>
-              <label className="visually-hidden" htmlFor="terms">
-                Payment terms
-              </label>
-              <textarea
-                id="terms"
-                value={draft.conditions}
-                maxLength="15000"
-                rows="8"
-                onChange={(e) => change("conditions", e.target.value)}
-              />
-            </section>
+              <output
+                aria-label="Configuration net total"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                {discountValid ? money(summary.netTotal) : "Invalid discount"}
+              </output>
+            </div>
           </div>
         </aside>
       </fieldset>

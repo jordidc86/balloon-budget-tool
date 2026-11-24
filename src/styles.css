@@ -175,6 +175,9 @@ h3 {
 .summary-column {
   min-width: 0;
 }
+.summary-column {
+  overflow-anchor: none;
+}
 .kit-panel {
   padding: 25px;
   background: linear-gradient(120deg, #eff6ff, #eef2ff);
@@ -302,6 +305,57 @@ h3 {
 .summary-sticky {
   position: sticky;
   top: 24px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 48px);
+  max-height: var(--summary-available-height, calc(100dvh - 48px));
+}
+.summary-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  padding: 2px 4px 0 2px;
+}
+.summary-scroll:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+  border-radius: 16px;
+}
+.summary-scroll .detail-panel:last-child {
+  margin-bottom: 0;
+}
+.configuration-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-top: 12px;
+  padding: 18px;
+  border-radius: 18px;
+  background: #172554;
+  color: white;
+  box-shadow: 0 4px 16px #17255420;
+}
+.configuration-total span,
+.configuration-total small {
+  display: block;
+}
+.configuration-total span {
+  font-size: 12px;
+  font-weight: bold;
+}
+.configuration-total small {
+  margin-top: 5px;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+.configuration-total output {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 .detail-panel {
   padding: 23px;
@@ -503,13 +557,11 @@ h3 {
   .app-shell {
     padding: 20px;
   }
-  .summary-sticky {
-    position: static;
-  }
 }
 @media (max-width: 720px) {
   .app-shell {
     padding: 12px;
+    padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
   }
   .quote-header {
     padding: 20px;
@@ -522,15 +574,33 @@ h3 {
     order: -1;
   }
   .summary-sticky {
+    position: static;
+    display: block;
+    max-height: none;
+  }
+  .summary-scroll {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+    overflow: visible;
+    padding: 0;
+    scrollbar-gutter: auto;
+  }
+  .configuration-total {
+    position: fixed;
+    z-index: 20;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    border-radius: 18px 18px 0 0;
+    padding: 14px 18px calc(14px + env(safe-area-inset-bottom, 0px));
   }
   .detail-panel {
     padding: 16px;
     margin: 0;
   }
-  .summary-sticky .detail-panel:nth-child(n + 3) {
+  .summary-scroll .detail-panel:nth-child(n + 3) {
     grid-column: 1/-1;
   }
   .toolbar {
@@ -591,7 +661,7 @@ h3 {
   }
 }
 @media (max-width: 390px) {
-  .summary-sticky {
+  .summary-scroll {
     display: flex;
     flex-direction: column;
   }
