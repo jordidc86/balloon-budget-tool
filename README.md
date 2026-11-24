@@ -54,7 +54,7 @@ Daily copying to the restricted Google Drive folder **PashaQuotes - Copias de se
 
 ## Browser behavior
 
-Drafts are retained locally when storage is available. Local-storage errors do not reverse a successful database save. Save/print operations share a synchronous lock. The print window opens during the click, before any network wait; unchanged saved quotations can be reprinted without a new save or number. PDFs use the confirmed server document, escaped content, repeated table headings and rows that avoid page breaks. End-of-month validity dates are clamped correctly.
+Drafts are retained locally when storage is available. Local-storage errors do not reverse a successful database save. Save/print operations share a synchronous lock. The print window opens during the click, before any network wait; unchanged saved quotations can be reprinted without a new save or number. PDFs use the confirmed server document, escaped content, repeated table headings and rows that avoid page breaks. The A4 print layout reserves 18 mm inside the document at each side, plus 16 mm top and bottom page margins. The same sheet geometry appears in the print preview; browser headers and footers should be disabled and scaling kept at 100%. Print checks include the owner-provided five-line quotation fitting on one sheet with all terms, a full Pasha kit, long notes/terms across pages, and output with background graphics disabled. End-of-month validity dates are clamped correctly.
 
 If a concurrent editor has changed a quotation, the second save returns a conflict without overwriting it. A draft with a lost response can be retried without receiving a new number.
 
