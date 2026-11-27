@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import SignIn from "./SignIn.jsx";
 import History from "./History.jsx";
+import PresentationComingSoon from "./PresentationComingSoon.jsx";
 import { accessToken } from "./auth-client.js";
 import {
   catalogs,
@@ -300,6 +301,19 @@ function Configurator({ vendor, onBack, user, signOut }) {
   async function retrieve(event) {
     event.preventDefault();
     if (working.current) return;
+    const hasDraftContent =
+      draft.items.length > 0 ||
+      Object.values(draft.customerData).some((value) => value.trim()) ||
+      draft.conditions !== DEFAULT_TERMS ||
+      Number(draft.discount) !== 0;
+    if (
+      dirty &&
+      hasDraftContent &&
+      !window.confirm(
+        "Load another quotation and discard the current unsaved changes? Cancel to keep editing or save your changes first.",
+      )
+    )
+      return;
     working.current = true;
     setBusy(true);
     setNotice(null);
@@ -919,6 +933,15 @@ function Configurator({ vendor, onBack, user, signOut }) {
 }
 function Workspace({ user, signOut }) {
   const [vendor, setVendor] = useState(null);
+  const [presentationOpen, setPresentationOpen] = useState(false);
+  if (presentationOpen)
+    return (
+      <PresentationComingSoon
+        user={user}
+        signOut={signOut}
+        onBack={() => setPresentationOpen(false)}
+      />
+    );
   return vendor ? (
     <Configurator
       key={user.id + vendor}
@@ -949,6 +972,14 @@ function Workspace({ user, signOut }) {
             <span>ENTER CATALOG</span>
           </button>
         ))}
+        <button
+          type="button"
+          className="panel brand brand-presentation"
+          onClick={() => setPresentationOpen(true)}
+        >
+          <strong>CREATE PRESENTATION</strong>
+          <span className="construction-badge">UNDER CONSTRUCTION</span>
+        </button>
       </div>
       <p className="landing-note">
         Professional balloon quotations · References assigned automatically
