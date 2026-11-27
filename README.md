@@ -58,7 +58,13 @@ Drafts are retained locally when storage is available. Local-storage errors do n
 
 If a concurrent editor has changed a quotation, the second save returns a conflict without overwriting it. A draft with a lost response can be retried without receiving a new number.
 
+Loading another quotation asks for confirmation before replacing a draft with unsaved products, customer details, terms or a discount. Cancelling makes no retrieval request and retains the draft, including across a reload. A failed retrieval also leaves the current draft intact. Empty drafts and unchanged saved quotations do not prompt.
+
 The desktop quotation overview scrolls independently of the catalogue, with its height adjusted to the visible viewport and a persistent net total. On mobile, the net total stays in a bottom bar while the catalogue uses normal page scrolling. The overview can also be scrolled with the keyboard; modal dialogs remain above the mobile total.
+
+## Presentations
+
+The authenticated manufacturer selection includes **Create presentation**, marked **Under construction**. It opens an informational screen outlining multiple brand references, a balloon design and a presentation PDF. Uploads, image generation, presentation numbering and external designer integration are not enabled. No AI credentials, calls or billing are configured by this placeholder.
 
 ## Operational limits
 

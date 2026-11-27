@@ -506,9 +506,9 @@ h3 {
 }
 .brand-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  width: min(900px, 100%);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  width: min(1100px, 100%);
 }
 .brand {
   padding: 65px 20px;
@@ -533,6 +533,72 @@ h3 {
   font-weight: bold;
   letter-spacing: 2px;
 }
+.brand-presentation {
+  background: linear-gradient(145deg, #f3f5ff, #fff);
+  border-color: #d4dcf5;
+}
+.brand-presentation strong {
+  font-size: clamp(22px, 2.4vw, 30px);
+  letter-spacing: -1px;
+  line-height: 1.2;
+  color: #33458a;
+}
+.construction-badge,
+.brand .construction-badge {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 8px 12px;
+  background: #fff4d6;
+  color: #855414;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.presentation-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px;
+}
+.presentation-intro {
+  margin-top: 24px;
+  padding: clamp(24px, 5vw, 60px);
+  background: linear-gradient(145deg, #fff, #f3f5ff);
+}
+.presentation-intro h1 {
+  margin: 24px 0 16px;
+  color: #172554;
+  font-size: clamp(30px, 5vw, 48px);
+  letter-spacing: -1.5px;
+}
+.presentation-intro p {
+  color: #526074;
+  line-height: 1.6;
+}
+.presentation-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  margin: 40px 0;
+}
+.presentation-steps > div > span {
+  color: #6677b3;
+  font-size: 13px;
+  font-weight: bold;
+}
+.presentation-steps h2 {
+  margin: 12px 0;
+  font-size: 18px;
+}
+.presentation-steps p {
+  font-size: 14px;
+  margin-bottom: 0;
+}
+.presentation-intro .presentation-coming-soon {
+  padding-top: 24px;
+  border-top: 1px solid #dbe3ee;
+  margin-bottom: 0;
+  font-size: 14px;
+}
 .landing-note {
   color: #94a3b8;
   font-size: 12px;
@@ -546,6 +612,15 @@ h3 {
   clip: rect(0, 0, 0, 0);
 }
 @media (max-width: 950px) {
+  .brand-grid {
+    gap: 16px;
+  }
+  .brand strong {
+    font-size: 28px;
+  }
+  .brand-presentation strong {
+    font-size: 23px;
+  }
   .quote-header {
     align-items: start;
     flex-direction: column;
@@ -559,6 +634,14 @@ h3 {
   }
 }
 @media (max-width: 720px) {
+  .presentation-shell {
+    padding: 20px;
+  }
+  .presentation-steps {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin: 30px 0;
+  }
   .app-shell {
     padding: 12px;
     padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
